@@ -1,0 +1,52 @@
+{
+  "patch": "CSP locator assertions and CI diagnostics",
+  "recordedAt": "2026-10-05",
+  "sourceArchiveSha256": "cb6b94870340f1c0d80a7acfe98519f76d0c8e96ff5230cdff80aca0d9ea64a8",
+  "reportedCommit": "c25472be9f32415f199cdedd0664105d09bd6676",
+  "reportedRun": 37298864318,
+  "sourceOfPatch": "previously delivered archive; remote commit content not independently fetched",
+  "changedProductionJavaFiles": 0,
+  "springBootVersionUnchanged": "4.1.1",
+  "removedEvalPollingCallSites": 7,
+  "tests": {
+    "coreJava21": {
+      "passed": 216,
+      "scope": "core only, not Maven"
+    },
+    "frontend": {
+      "passed": 31
+    },
+    "cspAssertions": {
+      "passed": 8,
+      "scope": "real Chromium, enforced meta CSP, no HTTP navigation"
+    },
+    "uiBridge": {
+      "passed": 116,
+      "scope": "DOM and synthetic HTTP bridge; not native CSP/cookies"
+    },
+    "releaseGate": {
+      "passed": 14
+    },
+    "restore": {
+      "passed": 12
+    },
+    "evidenceCli": {
+      "passed": 4
+    },
+    "workflowShell": {
+      "passed": 7,
+      "scope": "YAML/Bash and simulated process, not Maven"
+    }
+  },
+  "nativeBrowserNavigation": "blocked by environment: ERR_BLOCKED_BY_ADMINISTRATOR",
+  "fullSpringBootReactor": "not executed; Maven unavailable and Maven Central DNS unresolved",
+  "java25": "not installed; not tested",
+  "javaJobRootCause": "unknown: supplied excerpt lacks failure; authenticated GitHub logs required",
+  "githubRunAfterPatch": "not executed",
+  "securityChanges": {
+    "unsafeEvalAdded": false,
+    "cspBypassed": false,
+    "testsSkipped": false,
+    "failuresIgnored": false
+  }
+}

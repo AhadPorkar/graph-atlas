@@ -4,6 +4,11 @@
 
 Stand 05.10.2026. Die Ergebnisse betreffen diesen Quellcode, keine Kundeninstallation. Konsolenausgaben und strukturierte Ergebnisse stehen im [QA-Verzeichnis](../qa/).
 
+## CI-Hotfix-Nachtrag
+
+Der erste gemeldete CI-Lauf scheiterte beim CSP-bezogenen Browser-Polling und in separaten Maven-Jobs. Die Browser-Assertions wurden korrigiert; zur Java-Ursache fehlt das Fehlerprotokoll. Siehe [CI-Diagnose und Patchprüfung](ci-troubleshooting.md). Historische Testergebnisse gelten weiterhin nur für ihren angegebenen Umfang.
+
+
 ## Durchgeführt
 
 | Suite | Ergebnis | Umfang |

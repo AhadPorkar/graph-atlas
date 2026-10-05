@@ -1,0 +1,11 @@
+{
+  "suite": "csp-locator-assertions",
+  "status": "passed",
+  "testsRun": 8,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "scope": "Chromium set_content with a hash-authorized fixture script and enforced meta CSP",
+  "springBootRuntimeTest": false,
+  "nativeHttpNavigationTest": false
+}

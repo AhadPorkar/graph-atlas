@@ -4,6 +4,11 @@
 
 Recorded 2026-10-05. Results below refer to the delivered source, not a customer installation. Machine-readable and console evidence lives in [the QA directory](../qa/).
 
+## CI hotfix follow-up
+
+The initial hosted CI run reported a CSP evaluation failure in browser polling and separate Maven job failures. The browser waits have been corrected; the Java root cause requires the missing failure log. See [CI troubleshooting and patch validation](ci-troubleshooting.md). Historical test results below remain limited to their stated scope.
+
+
 ## Executed
 
 | Suite | Result | Scope |

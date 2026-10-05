@@ -17,11 +17,12 @@ import mimetypes
 import os
 import shutil
 import threading
+import traceback
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlsplit
 
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import expect, sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 STATIC = ROOT / "repository-server/src/main/resources/static"
@@ -169,15 +170,14 @@ def ready(page):
 
 def switch(page, language, location="header"):
     page.locator(f"{location} [data-language-switch]").select_option(language)
-    page.wait_for_function("(language) => document.documentElement.lang === language", arg=language)
+    expect(page.locator("html")).to_have_attribute("lang", language)
     ready(page)
 
 
 def navigate(page, route):
     page.evaluate("(route) => { location.hash = route; }", route)
     language = page.locator("html").get_attribute("lang")
-    page.wait_for_function("(heading) => document.querySelector('#content h1')?.textContent === heading",
-                           arg=CATALOGS[language][route])
+    expect(page.locator("#content h1")).to_have_text(CATALOGS[language][route])
     ready(page)
 
 
@@ -245,6 +245,10 @@ def main():
     args = parser.parse_args()
     REPORTS.mkdir(parents=True, exist_ok=True)
     ASSETS.mkdir(parents=True, exist_ok=True)
+    RESULTS.clear()
+    REQUESTS.clear()
+    for name in ("browser-report.json", "browser-failure.txt", "browser-failure.png", "browser-trace.zip"):
+        (REPORTS / name).unlink(missing_ok=True)
     server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
     worker = threading.Thread(target=server.serve_forever, daemon=True)
     worker.start()
@@ -261,172 +265,186 @@ def main():
             context = browser.new_context(viewport={"width": 1440, "height": 1000}, locale="de-DE")
             page = context.new_page()
             page.set_default_timeout(10000)
-            page.on("pageerror", lambda error: errors.append(str(error)))
-            if args.bridge:
-                bridge_bootstrap(page, base)
-            else:
-                page.goto(base)
-            page.wait_for_selector("#login:not([hidden])")
-            check(page.locator("html").get_attribute("lang") == "en", "English default despite a German browser locale")
-            check(page.locator("html").get_attribute("dir") == "ltr", "Initial LTR layout")
-            check(page.locator("#loginForm button").inner_text() == "Sign in", "English default sign-in label")
-            screenshot(page, "login-en.png")
-            page.locator("#loginForm [name=password]").fill("incorrect")
-            page.locator("#loginForm button").click()
-            page.wait_for_function("document.querySelector('#loginError').textContent.length > 0")
-            check("Sign in" in page.locator("#loginError").inner_text(), "Localized authentication error")
-            page.locator("#login [data-language-switch]").select_option("de")
-            page.wait_for_function("document.documentElement.lang === 'de'")
-            check("Melden" in page.locator("#loginError").inner_text(), "Existing authentication error retranslates")
-            page.locator("#loginForm [name=password]").fill(PASSWORD)
-            page.locator("#loginForm button").click()
-            ready(page)
-            check(page.locator("#content h1").inner_text() == CATALOGS["de"]["dashboard"], "German sign-in and dashboard")
-            for language, direction in (("en", "ltr"), ("de", "ltr"), ("fa", "rtl")):
-                switch(page, language)
-                check(page.locator("html").get_attribute("dir") == direction, f"{language}: document direction")
-                navigate(page, "dashboard")
+            expect.set_options(timeout=10000)
+            context.tracing.start(screenshots=True, snapshots=True, sources=True)
+            try:
+                page.on("pageerror", lambda error: errors.append(str(error)))
+                if args.bridge:
+                    bridge_bootstrap(page, base)
+                else:
+                    page.goto(base)
+                page.wait_for_selector("#login:not([hidden])")
+                check(page.locator("html").get_attribute("lang") == "en", "English default despite a German browser locale")
+                check(page.locator("html").get_attribute("dir") == "ltr", "Initial LTR layout")
+                check(page.locator("#loginForm button").inner_text() == "Sign in", "English default sign-in label")
+                screenshot(page, "login-en.png")
+                page.locator("#loginForm [name=password]").fill("incorrect")
+                page.locator("#loginForm button").click()
+                expect(page.locator("#loginError")).not_to_have_text("")
+                check("Sign in" in page.locator("#loginError").inner_text(), "Localized authentication error")
+                page.locator("#login [data-language-switch]").select_option("de")
+                expect(page.locator("html")).to_have_attribute("lang", "de")
+                check("Melden" in page.locator("#loginError").inner_text(), "Existing authentication error retranslates")
+                page.locator("#loginForm [name=password]").fill(PASSWORD)
+                page.locator("#loginForm button").click()
                 ready(page)
-                screenshot(page, f"dashboard-{language}.png")
-                for route in ("dashboard", "releases", "insights", "quarantine", "repos", "browse", "clients", "users", "tokens", "audit", "maintenance", "settings"):
-                    page.evaluate("(route) => { location.hash = route; }", route)
-                    page.wait_for_function("(heading) => document.querySelector('#content h1')?.textContent === heading",
-                                           arg=CATALOGS[language][route])
+                check(page.locator("#content h1").inner_text() == CATALOGS["de"]["dashboard"], "German sign-in and dashboard")
+                for language, direction in (("en", "ltr"), ("de", "ltr"), ("fa", "rtl")):
+                    switch(page, language)
+                    check(page.locator("html").get_attribute("dir") == direction, f"{language}: document direction")
+                    navigate(page, "dashboard")
                     ready(page)
-                    check(page.locator("#content h1").inner_text() == CATALOGS[language][route],
-                          f"{language}: {route} heading")
-                    check(page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1"),
-                          f"{language}: {route} desktop has no page overflow")
-                latest = [item for item in REQUESTS if item["path"] == "/api/system"][-1]
-                check(latest["language"] == language, f"{language}: selected Accept-Language reaches HTTP requests")
-            # Actual delivered views and dialogs, with synthetic API data explicitly labelled.
-            switch(page, "en")
-            navigate(page, "releases")
-            check(page.locator('.release-lane').count() == 4, 'Release board has four active lanes')
-            screenshot(page, "releases-en.png")
-            page.locator('#releaseState').select_option('RELEASED')
-            ready(page)
-            page.wait_for_function("document.querySelectorAll('.release-lane').length === 1")
-            check(page.locator('.release-card').count() == 2, 'Server-side stage filter is reflected in cards')
-            page.locator('.release-card').first.click()
-            page.wait_for_selector('#verifyCapsule')
-            check(page.locator('#dialogBody a[href$="/assets/0"]').count() == 1, 'Released capsule links to frozen delivery endpoint')
-            page.locator('#verifyCapsule').click()
-            page.wait_for_selector('.gate-open')
-            check(page.locator('.gate-open').count() == 1, 'Deep verification result is displayed (synthetic response)')
-            screenshot(page, 'capsule-en.png')
-            page.locator('#closeDialog').click()
-            navigate(page, 'insights'); screenshot(page, 'insights-en.png')
-            check(page.locator('meter').get_attribute('value') == '28.9', 'Storage meter reflects supplied measured accounting')
-            navigate(page, 'quarantine'); screenshot(page, 'quarantine-en.png')
-            page.locator('#newHold').click()
-            page.locator('#holdForm [name=sha256]').fill('c' * 64)
-            page.locator('#holdForm [name=reason]').fill('Synthetic UI investigation only')
-            switch(page, 'de', '#dialog')
-            check(page.locator('#holdForm [name=reason]').input_value() == 'Synthetic UI investigation only', 'Containment reason survives language switch')
-            page.locator('#holdForm [type=submit]').click()
-            page.wait_for_function("!document.querySelector('#dialog').open")
-            check(any(i.get('body', {}).get('sha256') == 'c'*64 for i in REQUESTS), 'Containment sends explicit digest and revision')
-            navigate(page, 'browse')
-            page.locator('[data-add-release]').first.click()
-            page.locator('#createFromBasket').click()
-            page.wait_for_selector('#capsuleForm')
-            check(bool(page.locator('#capsuleForm [name=assets]').input_value()), 'Artifact explorer selection populates release capture')
-            page.locator('#capsuleForm [name=name]').fill('sample-release')
-            page.locator('#capsuleForm [name=version]').fill('1.0.0')
-            page.locator('#capsuleForm [name=note]').fill('Synthetic UI capture')
-            switch(page, 'fa', '#dialog')
-            check(page.locator('#capsuleForm [name=name]').input_value() == 'sample-release', 'Release name and selection survive RTL switching')
-            page.locator('#capsuleForm [type=submit]').click()
-            page.wait_for_selector('#transition-submit')
-            check('sample-release' in page.locator('#dialogTitle').inner_text(), 'Created capsule opens with server identifier')
-            page.locator('#transition-submit').click()
-            page.locator('#releaseDecision [name=note]').fill('Request independent review')
-            page.locator('#releaseDecision [type=submit]').click()
-            page.wait_for_selector('#verifyCapsule')
-            last = [i for i in REQUESTS if '/transitions/submit' in i['path']][-1]
-            check(last['body']['expectedRevision'] == 1, 'Decision sends the captured revision for optimistic concurrency')
-            page.locator('#closeDialog').click()
+                    screenshot(page, f"dashboard-{language}.png")
+                    for route in ("dashboard", "releases", "insights", "quarantine", "repos", "browse", "clients", "users", "tokens", "audit", "maintenance", "settings"):
+                        page.evaluate("(route) => { location.hash = route; }", route)
+                        expect(page.locator("#content h1")).to_have_text(CATALOGS[language][route])
+                        ready(page)
+                        check(page.locator("#content h1").inner_text() == CATALOGS[language][route],
+                              f"{language}: {route} heading")
+                        check(page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1"),
+                              f"{language}: {route} desktop has no page overflow")
+                    latest = [item for item in REQUESTS if item["path"] == "/api/system"][-1]
+                    check(latest["language"] == language, f"{language}: selected Accept-Language reaches HTTP requests")
+                # Actual delivered views and dialogs, with synthetic API data explicitly labelled.
+                switch(page, "en")
+                navigate(page, "releases")
+                check(page.locator('.release-lane').count() == 4, 'Release board has four active lanes')
+                screenshot(page, "releases-en.png")
+                page.locator('#releaseState').select_option('RELEASED')
+                ready(page)
+                expect(page.locator(".release-lane")).to_have_count(1)
+                check(page.locator('.release-card').count() == 2, 'Server-side stage filter is reflected in cards')
+                page.locator('.release-card').first.click()
+                page.wait_for_selector('#verifyCapsule')
+                check(page.locator('#dialogBody a[href$="/assets/0"]').count() == 1, 'Released capsule links to frozen delivery endpoint')
+                page.locator('#verifyCapsule').click()
+                page.wait_for_selector('.gate-open')
+                check(page.locator('.gate-open').count() == 1, 'Deep verification result is displayed (synthetic response)')
+                screenshot(page, 'capsule-en.png')
+                page.locator('#closeDialog').click()
+                navigate(page, 'insights'); screenshot(page, 'insights-en.png')
+                check(page.locator('meter').get_attribute('value') == '28.9', 'Storage meter reflects supplied measured accounting')
+                navigate(page, 'quarantine'); screenshot(page, 'quarantine-en.png')
+                page.locator('#newHold').click()
+                page.locator('#holdForm [name=sha256]').fill('c' * 64)
+                page.locator('#holdForm [name=reason]').fill('Synthetic UI investigation only')
+                switch(page, 'de', '#dialog')
+                check(page.locator('#holdForm [name=reason]').input_value() == 'Synthetic UI investigation only', 'Containment reason survives language switch')
+                page.locator('#holdForm [type=submit]').click()
+                expect(page.locator("#dialog")).not_to_be_visible()
+                check(any(i.get('body', {}).get('sha256') == 'c'*64 for i in REQUESTS), 'Containment sends explicit digest and revision')
+                navigate(page, 'browse')
+                page.locator('[data-add-release]').first.click()
+                page.locator('#createFromBasket').click()
+                page.wait_for_selector('#capsuleForm')
+                check(bool(page.locator('#capsuleForm [name=assets]').input_value()), 'Artifact explorer selection populates release capture')
+                page.locator('#capsuleForm [name=name]').fill('sample-release')
+                page.locator('#capsuleForm [name=version]').fill('1.0.0')
+                page.locator('#capsuleForm [name=note]').fill('Synthetic UI capture')
+                switch(page, 'fa', '#dialog')
+                check(page.locator('#capsuleForm [name=name]').input_value() == 'sample-release', 'Release name and selection survive RTL switching')
+                page.locator('#capsuleForm [type=submit]').click()
+                page.wait_for_selector('#transition-submit')
+                check('sample-release' in page.locator('#dialogTitle').inner_text(), 'Created capsule opens with server identifier')
+                page.locator('#transition-submit').click()
+                page.locator('#releaseDecision [name=note]').fill('Request independent review')
+                page.locator('#releaseDecision [type=submit]').click()
+                page.wait_for_selector('#verifyCapsule')
+                last = [i for i in REQUESTS if '/transitions/submit' in i['path']][-1]
+                check(last['body']['expectedRevision'] == 1, 'Decision sends the captured revision for optimistic concurrency')
+                page.locator('#closeDialog').click()
 
-            # Edit an unsaved form while switching between all three languages.
-            navigate(page, "repos")
-            ready(page)
-            page.locator("#newRepo").click()
-            page.locator('#repoForm [name=name]').fill("unsaved-repository")
-            page.locator('#repoForm [name=format]').select_option("npm")
-            page.locator('#repoForm [name=type]').select_option("proxy")
-            page.locator('#repoForm [name=upstream]').fill("https://registry.npmjs.org/")
-            switch(page, "de", "#dialog")
-            check(page.locator('#repoForm [name=name]').input_value() == "unsaved-repository", "Unsaved name survives language switching")
-            check(page.locator('#repoForm [name=format]').input_value() == "npm", "Unsaved format survives language switching")
-            check(page.locator('#repoForm [name=upstream]').input_value() == "https://registry.npmjs.org/", "Unsaved upstream URL survives language switching")
-            check(page.locator("#dialogTitle").inner_text() == CATALOGS["de"]["newRepo"], "Dialog title switches to German")
-            screenshot(page, "repository-dialog-de.png")
-            page.locator("#closeDialog").click()
-            # Selected uploads must not disappear when translating an open dialog.
-            navigate(page, "browse")
-            ready(page)
-            page.locator("#upload").click()
-            page.locator('#uploadForm [name=file]').set_input_files({
-                "name": "fixture.txt", "mimeType": "text/plain", "buffer": b"UI fixture only"
-            })
-            switch(page, "fa", "#dialog")
-            check(page.locator('#uploadForm [name=file]').evaluate("(element) => element.files[0].name") == "fixture.txt",
-                  "Selected file survives dialog retranslation")
-            check(page.locator('#uploadForm [name=path]').input_value() == "fixture.txt", "Upload path is retained")
-            page.locator("#closeDialog").click()
-            # One-time tokens are not generated again on a language change.
-            navigate(page, "tokens")
-            ready(page)
-            page.locator("#newToken").click()
-            page.locator('#tokenForm [name=label]').fill("UI test only")
-            page.locator('#tokenForm [type=submit]').click()
-            page.wait_for_selector(".token-value")
-            before = len([item for item in REQUESTS if item["path"] == "/api/tokens" and "body" in item])
-            switch(page, "en", "#dialog")
-            check(page.locator(".token-value").inner_text() == "fixture-only-not-a-real-token",
-                  "One-time token stays visible when language changes")
-            after = len([item for item in REQUESTS if item["path"] == "/api/tokens" and "body" in item])
-            check(before == after == 1, "Language change does not issue another token")
-            # Reproduce a queued close event from the previous form after its replacement opened.
-            page.evaluate("document.querySelector('#dialog').dispatchEvent(new Event('close'))")
-            check(page.locator(".token-value").inner_text() == "fixture-only-not-a-real-token",
-                  "A delayed close event cannot clear a replacement token dialog")
-            page.locator("#closeDialog").click()
-            if args.bridge:
-                check(page.evaluate("localStorage.getItem('graph.repository.language')") == "en",
-                      "Selected language is stored (bridge; native reload/cookie checks excluded)")
-            else:
-                page.reload()
+                # Edit an unsaved form while switching between all three languages.
+                navigate(page, "repos")
                 ready(page)
-                check(page.locator("html").get_attribute("lang") == "en", "Selected language persists on reload")
-                cookies = context.cookies()
-                check(any(cookie["name"] == "gr_session" and cookie["httpOnly"] for cookie in cookies), "Native HttpOnly fixture cookie used")
-            # Mobile RTL and LTR layout, navigation and German long labels.
-            page.set_viewport_size({"width": 390, "height": 844})
-            for language in ("en", "de", "fa"):
-                switch(page, language)
-                navigate(page, "dashboard")
+                page.locator("#newRepo").click()
+                page.locator('#repoForm [name=name]').fill("unsaved-repository")
+                page.locator('#repoForm [name=format]').select_option("npm")
+                page.locator('#repoForm [name=type]').select_option("proxy")
+                page.locator('#repoForm [name=upstream]').fill("https://registry.npmjs.org/")
+                switch(page, "de", "#dialog")
+                check(page.locator('#repoForm [name=name]').input_value() == "unsaved-repository", "Unsaved name survives language switching")
+                check(page.locator('#repoForm [name=format]').input_value() == "npm", "Unsaved format survives language switching")
+                check(page.locator('#repoForm [name=upstream]').input_value() == "https://registry.npmjs.org/", "Unsaved upstream URL survives language switching")
+                check(page.locator("#dialogTitle").inner_text() == CATALOGS["de"]["newRepo"], "Dialog title switches to German")
+                screenshot(page, "repository-dialog-de.png")
+                page.locator("#closeDialog").click()
+                # Selected uploads must not disappear when translating an open dialog.
+                navigate(page, "browse")
                 ready(page)
-                check(page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1"),
-                      f"{language}: mobile dashboard has no horizontal page overflow")
-                screenshot(page, f"mobile-{language}.png")
-                page.locator("#menuBtn").click()
-                check(page.locator("#menuBtn").get_attribute("aria-expanded") == "true", f"{language}: mobile menu opens")
-                page.keyboard.press("Escape")
-                check(page.locator("#menuBtn").get_attribute("aria-expanded") == "false", f"{language}: Escape closes mobile menu")
-            check(not errors, f"No unhandled browser errors ({len(errors)})")
-            # Fresh browser contexts do not inherit language preferences.
-            fresh = browser.new_context(locale="fa-IR")
-            fresh_page = fresh.new_page()
-            if args.bridge:
-                bridge_bootstrap(fresh_page, base)
-            else:
-                fresh_page.goto(base)
-            fresh_page.wait_for_selector("#login:not([hidden])")
-            check(fresh_page.locator("html").get_attribute("lang") == "en", "Fresh Persian browser still starts in English")
-            fresh.close()
-            browser.close()
+                page.locator("#upload").click()
+                page.locator('#uploadForm [name=file]').set_input_files({
+                    "name": "fixture.txt", "mimeType": "text/plain", "buffer": b"UI fixture only"
+                })
+                switch(page, "fa", "#dialog")
+                check(page.locator('#uploadForm [name=file]').evaluate("(element) => element.files[0].name") == "fixture.txt",
+                      "Selected file survives dialog retranslation")
+                check(page.locator('#uploadForm [name=path]').input_value() == "fixture.txt", "Upload path is retained")
+                page.locator("#closeDialog").click()
+                # One-time tokens are not generated again on a language change.
+                navigate(page, "tokens")
+                ready(page)
+                page.locator("#newToken").click()
+                page.locator('#tokenForm [name=label]').fill("UI test only")
+                page.locator('#tokenForm [type=submit]').click()
+                page.wait_for_selector(".token-value")
+                before = len([item for item in REQUESTS if item["path"] == "/api/tokens" and "body" in item])
+                switch(page, "en", "#dialog")
+                check(page.locator(".token-value").inner_text() == "fixture-only-not-a-real-token",
+                      "One-time token stays visible when language changes")
+                after = len([item for item in REQUESTS if item["path"] == "/api/tokens" and "body" in item])
+                check(before == after == 1, "Language change does not issue another token")
+                # Reproduce a queued close event from the previous form after its replacement opened.
+                page.evaluate("document.querySelector('#dialog').dispatchEvent(new Event('close'))")
+                check(page.locator(".token-value").inner_text() == "fixture-only-not-a-real-token",
+                      "A delayed close event cannot clear a replacement token dialog")
+                page.locator("#closeDialog").click()
+                if args.bridge:
+                    check(page.evaluate("localStorage.getItem('graph.repository.language')") == "en",
+                          "Selected language is stored (bridge; native reload/cookie checks excluded)")
+                else:
+                    page.reload()
+                    ready(page)
+                    check(page.locator("html").get_attribute("lang") == "en", "Selected language persists on reload")
+                    cookies = context.cookies()
+                    check(any(cookie["name"] == "gr_session" and cookie["httpOnly"] for cookie in cookies), "Native HttpOnly fixture cookie used")
+                # Mobile RTL and LTR layout, navigation and German long labels.
+                page.set_viewport_size({"width": 390, "height": 844})
+                for language in ("en", "de", "fa"):
+                    switch(page, language)
+                    navigate(page, "dashboard")
+                    ready(page)
+                    check(page.evaluate("document.documentElement.scrollWidth <= innerWidth + 1"),
+                          f"{language}: mobile dashboard has no horizontal page overflow")
+                    screenshot(page, f"mobile-{language}.png")
+                    page.locator("#menuBtn").click()
+                    check(page.locator("#menuBtn").get_attribute("aria-expanded") == "true", f"{language}: mobile menu opens")
+                    page.keyboard.press("Escape")
+                    check(page.locator("#menuBtn").get_attribute("aria-expanded") == "false", f"{language}: Escape closes mobile menu")
+                check(not errors, f"No unhandled browser errors ({len(errors)})")
+                # Fresh browser contexts do not inherit language preferences.
+                fresh = browser.new_context(locale="fa-IR")
+                fresh_page = fresh.new_page()
+                if args.bridge:
+                    bridge_bootstrap(fresh_page, base)
+                else:
+                    fresh_page.goto(base)
+                fresh_page.wait_for_selector("#login:not([hidden])")
+                check(fresh_page.locator("html").get_attribute("lang") == "en", "Fresh Persian browser still starts in English")
+                fresh.close()
+            except Exception:
+                # Do not replace the original exception if evidence capture itself fails.
+                (REPORTS / "browser-failure.txt").write_text(traceback.format_exc(), encoding="utf-8")
+                try:
+                    page.screenshot(path=str(REPORTS / "browser-failure.png"), full_page=True)
+                except Exception as capture_error:
+                    errors.append(f"Failure screenshot unavailable: {capture_error}")
+                raise
+            finally:
+                try:
+                    context.tracing.stop(path=str(REPORTS / "browser-trace.zip"))
+                finally:
+                    browser.close()
             succeeded = True
     finally:
         server.shutdown()

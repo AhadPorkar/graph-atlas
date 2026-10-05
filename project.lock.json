@@ -47,5 +47,7 @@
   "actualEvidenceCliTests": 4,
   "actualRestoreTests": 12,
   "newReleaseCoreChecks": 68,
-  "bilingualGuidePairs": 19
+  "bilingualGuidePairs": 20,
+  "ciHotfix": "CSP-safe locator assertions; full Java root cause pending logs",
+  "actualCspAssertionTests": 8
 }

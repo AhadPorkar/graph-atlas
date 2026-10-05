@@ -15,14 +15,14 @@ concurrency:
 jobs:
   source-and-ui:
     name: Source, translations and browser fixtures
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: '22'
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.13'
       - name: Check repository structure and bilingual documentation
@@ -33,56 +33,97 @@ jobs:
         run: python tests/release_gate_test.py
       - name: Test the offline restore helper
         run: python tests/restore_test.py
+      - name: Clear historical browser evidence
+        run: rm -f docs/qa/browser-report.json docs/qa/browser-failure.txt docs/qa/browser-failure.png docs/qa/browser-trace.zip docs/qa/csp-assertions-report.json
       - name: Install browser test tools
         run: |
           python -m pip install -r tests/requirements.txt
           python -m playwright install --with-deps chromium
+      - name: Verify locator assertions with enforced CSP
+        run: python tests/csp_assertions_test.py
       - name: Test native browser navigation against synthetic fixtures
         run: python tests/ui_test.py
       - name: Upload browser evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: browser-fixture-evidence
           path: |
             docs/qa/browser-report.json
-            docs/assets/*.png
+            docs/qa/browser-failure.txt
+            docs/qa/browser-failure.png
+            docs/qa/browser-trace.zip
+            docs/qa/csp-assertions-report.json
 
   java:
     name: Spring Boot / Java ${{ matrix.java }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
         java: ['21', '25']
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: ${{ matrix.java }}
           cache: maven
+      - name: Clear historical runtime evidence
+        run: rm -f docs/qa/integration-report.json docs/qa/evidence-cli-tests.txt
+      - name: Record Java and Maven versions
+        run: |
+          java -version
+          mvn -version
       - name: Compile and test the real Maven reactor
-        run: mvn -B -ntp -Djava.version=${{ matrix.java }} clean verify
-      - uses: actions/setup-node@v4
+        id: maven
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Keep the log outside target: Maven clean removes target directories.
+          mvn -B -ntp -e -Dstyle.color=never -DtrimStackTrace=false \
+            -Djava.version=${{ matrix.java }} clean verify 2>&1 \
+            | tee maven-java-${{ matrix.java }}.log
+      - name: Print Maven failure and test reports
+        if: ${{ failure() && steps.maven.outcome == 'failure' }}
+        shell: bash
+        run: |
+          echo "::group::Maven log tail"
+          if [[ -f maven-java-${{ matrix.java }}.log ]]; then
+            tail -n 180 maven-java-${{ matrix.java }}.log
+          fi
+          echo "::endgroup::"
+          for reports in repository-core/target/surefire-reports repository-server/target/surefire-reports; do
+            if [[ -d "$reports" ]]; then
+              echo "::group::$reports"
+              find "$reports" -maxdepth 1 -type f -name '*.txt' -print -exec tail -n 120 {} \;
+              echo "::endgroup::"
+            fi
+          done
+      - uses: actions/setup-node@v5
         with:
           node-version: '22'
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.13'
       - name: Install HTTP test dependencies
         run: python -m pip install -r tests/requirements.txt
       - name: Verify the standalone signed-evidence tool
-        run: python tests/evidence_cli_test.py
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tests/evidence_cli_test.py 2>&1 | tee docs/qa/evidence-cli-tests.txt
       - name: Exercise the real server and available npm/pip clients
         run: python tests/integration.py
       - name: Upload results even on failure
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: java-${{ matrix.java }}-evidence
           path: |
+            maven-java-${{ matrix.java }}.log
             repository-core/target/surefire-reports/
             repository-server/target/surefire-reports/
-            docs/qa/*report.json
+            docs/qa/integration-report.json
+            docs/qa/evidence-cli-tests.txt
