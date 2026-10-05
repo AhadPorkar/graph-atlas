@@ -1,95 +1,106 @@
-# CI-Hotfix: CSP-kompatible Browser-Assertions und Maven-Diagnose
+# CI-Korrektur: npm-Pfade mit Scope und CSP-sichere Browsertests
 
-[English](../en/ci-troubleshooting.md) | [Prüfbericht](testing.md).
+[English](../en/ci-troubleshooting.md) | [Testbericht](testing.md).
 
-## Umfang
+## Befund aus den Protokollen
 
-Der Patch behandelt den gemeldeten Browserfehler für Commit `c25472be9f32415f199cdedd0664105d09bd6676` im Lauf `37298864318`.
-Grundlage ist das zuvor gelieferte Quellcode-ZIP. Der Assistent hat keine Änderungen zu GitHub gepusht.
-Im bereitgestellten Ausschnitt fehlt die eigentliche Java-Fehlermeldung. **Eine Behebung der Java-Jobs wird nicht behauptet.**
-Produktiver Java-Code, Spring-Boot-Version, CSRF-Regeln und CSP bleiben unverändert.
+Das hochgeladene Archiv `logs_101023669665.zip` enthält die drei Jobprotokolle
+von Lauf `37298864318`, Commit `c25472be9f32415f199cdedd0664105d09bd6676`.
+Java 21 und Java 25 konnten beide Module kompilieren und Spring Boot 4.1.1 mit
+Tomcat 11.0.24 starten. Im Servermodul scheiterte jeweils einer von 20 Tests:
+`TomcatWireTest.streamingRangesScopedPathsAndStatelessAuthentication:74`.
+`PUT /repository/npm-hosted/@wire%2Fdemo` erwartete HTTP 201, erhielt jedoch
+400 mit `BAD_PATH` und `Request rejected by the HTTP firewall`.
+Die vier JUnit-Einstiegstests des Kerns waren erfolgreich. Es handelt sich um
+eine Laufzeit-Assertion, nicht um einen Compiler-, Abhängigkeits- oder Startfehler.
+Siehe [extrahierte Diagnose](../qa/ci-fix2-diagnosis.txt).
 
-## Bestätigter Browserfehler
+Diese Protokolle gehören zum **unkorrigierten** Commit. Sie belegen weder den
+Erfolg dieser Korrektur noch nachfolgender Paketierungs- und Integrationstests.
 
-Der Traceback stammt aus `Page.wait_for_function`, nicht aus der Übersetzungslogik.
-Playwright 1.57.0 wertet den Polling-Ausdruck mit `globalThis.eval` im Seitenkontext aus.
-Die Richtlinie `script-src 'self'` erlaubt dies nicht.
-Eine Arrow-Funktion als Argument reicht nicht aus, da dieselbe Auswertung verwendet wird.
+## Java-Korrektur
 
-Alle sieben Aufrufstellen in `tests/ui_test.py` verwenden jetzt automatisch wiederholte Locator-Assertions:
+In `ServletContainerConfiguration.java` wird
+`connector.setEncodedSolidusHandling("passthrough")` ersetzt durch:
+
+```java
+connector.setEncodedSolidusHandling("decode");
+connector.setEncodedReverseSolidusHandling("reject");
+```
+
+Bei `passthrough` bleibt `%2F` im Servlet-Mapping-Pfad erhalten. Die strikte
+Spring-Security-Firewall verwirft dort ein verbleibendes `%`, auch wenn kodierte
+Schrägstriche erlaubt wurden. Tomcat soll den dekodierten Mapping-Pfad liefern.
+
+`HttpServletRequest.getRequestURI()` bleibt unverändert kodiert.
+`RequestAuditFilter` prüft diesen Originalpfad mit `RequestPaths.decode()` vor
+den Security-Filterketten. Der bereits dekodierte Servlet-Pfad wird nicht erneut
+dekodiert. Beide Ansichten werden unabhängig aus dem Original abgeleitet.
+Kodierte Trennzeichen außerhalb des Paketnamensraums, kodierte Repository-Namen,
+Traversal, doppelte Schrägstriche, Prozentzeichen und Backslashes bleiben gesperrt.
+
+Weder `setAllowUrlEncodedPercent(true)` noch gelöschte Firewall-Blocklisten,
+ausgelassene Tests oder eine entfernte Pfadprüfung sind Teil dieser Korrektur.
+
+## Beibehaltene Browserkorrektur
+
+Das Browserprotokoll zeigt unabhängig davon einen CSP-Fehler in
+`Page.wait_for_function`. Die sieben Aufrufstellen wurden durch wiederholende
+Locator-Assertions ersetzt:
 
 ```python
 from playwright.sync_api import expect
-
 expect(page.locator("html")).to_have_attribute("lang", "de")
-expect(page.locator("#content h1")).to_have_text(expected_heading)
-expect(page.locator("#loginError")).not_to_have_text("")
-expect(page.locator(".release-lane")).to_have_count(1)
-expect(page.locator("#dialog")).not_to_be_visible()
 ```
 
-Die produktive CSP wird nicht gelockert. Der Workflow aktiviert weder `bypass_csp` noch `unsafe-eval` und überspringt keine fehlgeschlagenen Tests.
-Native Navigation wird in CI nicht durch den Bridge-Modus ersetzt.
-Die Suite speichert einen Browser-Trace und bei Fehlern einen Screenshot sowie den Traceback, bevor der Browser geschlossen wird.
-Hochgeladen werden frische Testnachweise statt Marketingbilder oder historischer Erfolgsmeldungen.
+`unsafe-eval` und `bypass_csp` bleiben deaktiviert. CI verlangt weiterhin native
+Browsernavigation; der lokale Bridge-Modus ersetzt diesen Test nicht.
+Fehler-Screenshots und Traces bleiben verfügbar.
 
-## Zusätzliche Regressionstests
+## Regressionstests
+
+`RequestPathPolicyTestMain` ergänzt 30 ausgeführte Prüfungen für Original-URIs:
+Scope-Namen, erhaltene Pluszeichen und abgewiesene mehrdeutige Pfade. Die Tests
+laufen über `CoreRegressionTest` in Maven und die Core-Skripte für Linux/PowerShell.
+
+`ServletPathFirewallTest` enthält drei neue Maven-Tests für die Firewall-Sichten
+und erhaltene Blocklisten. Sie wurden hier geschrieben, aber nicht ausgeführt.
+`TomcatWireTest` behält die ursprüngliche Veröffentlichungs-Assertion bei und
+prüft weitere Kodierungen, identische Dateiinhalte und abgewiesene Pfade mit
+und ohne Zugangsdaten. Nur der echte Maven-Lauf prüft das Tomcat-Verhalten.
+
+## Erneute Ausführung
 
 ```bash
+mvn -B -ntp -e -Djava.version=21 clean verify
+# Mit aktivem JDK 25:
+mvn -B -ntp -e -Djava.version=25 clean verify
+# Nach erfolgreichem Maven-Build:
+python tests/integration.py
 python tests/csp_assertions_test.py
+python tests/ui_test.py
 ```
 
-Acht Tests laufen in Chromium mit `page.set_content` und restriktiver Meta-CSP.
-Nur das genaue Fixture-Skript ist durch einen SHA-256-Hash zugelassen; eval bleibt verboten.
-Die eval-Prüfung wird durch einen echten Klick der Seite ausgelöst und nicht durch CDP-Auswertung, deren CSP-Verhalten abweichen kann.
-Die Tests prüfen asynchrone Sprach-, Überschriften-, Fehlermeldungs-, Lane- und Dialogzustände, einen korrekt fehlschlagenden Sprachvergleich sowie den Schutz vor einer Lockerung der CSP.
-Dies ist **kein** Test von Spring Boot, nativer HTTP-Navigation oder HTTP-Cookies.
+CI speichert Maven-Ausgabe und Surefire-Berichte auch bei einem Fehler.
+Die Exit-Codes bleiben trotz `tee` erhalten. Den Lauf des **neuen Commits**
+prüfen; ein erneuter Lauf des alten Commits verwendet weiterhin den alten Code.
+Weitere Fehler in späteren Schritten sind nicht ausgeschlossen.
 
-## Maven-Diagnose
+## Tatsächliche lokale Validierung
 
-Der vollständige Reactor wird weiterhin mit Java 21 und Java 25 gebaut.
-Der Workflow protokolliert die Java-/Maven-Versionen und verwendet `-e` sowie `-DtrimStackTrace=false`.
-Standardausgabe und Fehlerausgabe werden in `maven-java-21.log` bzw. `maven-java-25.log` gespeichert.
-Die Dateien liegen außerhalb von `target`, damit `mvn clean` sie nicht löscht.
-`set -euo pipefail` erhält den Fehlerstatus durch `tee` hindurch.
-Bei einem Maven-Fehler werden das Protokollende und die Surefire-Berichte ausgegeben. Das vollständige Protokoll und die Modulberichte stehen als Artefakte zur Verfügung.
-Ohne konkrete Fehlermeldung wurde keine Abhängigkeitsversion auf Verdacht geändert.
+246 Core-Prüfungen auf OpenJDK 21.0.11 (216 bestehende und 30 neue),
+31 Frontend-Tests, acht CSP-Tests, 14 Gate-Client-Tests, zwölf Restore-Tests und
+vier Evidenz-Verifier-Tests waren erfolgreich. Die native Browsernavigation
+wurde von der Umgebung mit `ERR_BLOCKED_BY_ADMINISTRATOR` blockiert.
+Maven und JDK 25 sind lokal nicht verfügbar. Der vollständige korrigierte
+Spring-Boot-/Tomcat-Lauf sowie GitHub CI sind **noch nicht bestätigt**.
+Siehe [aktueller Validierungsbericht](../qa/ci-fix2-validation.json).
+Der [frühere CSP-Bericht](../qa/ci-hotfix-validation.json) ist historisch.
 
-Das bereits fehlgeschlagene Jobprotokoll lässt sich mit der angemeldeten GitHub CLI abrufen:
+## Quellen
 
-```powershell
-gh run view 37298864318 --repo AhadPorkar/graph-atlas --job 111726530739 --log-failed |
-    Set-Content -Encoding utf8 "$HOME\Downloads\graph-atlas-java21-failed.txt"
-```
-
-Für alle fehlgeschlagenen Schritte `--job 111726530739` weglassen.
-Protokolle vor dem Teilen auf Zugangsdaten prüfen. Ein Ausschnitt mit `PASS`-Zeilen identifiziert weder einen Compiler- noch einen Abhängigkeits-, Start- oder Testfehler.
-
-## Workflow-Pflege
-
-Als Runner ist `ubuntu-24.04` statt des wechselnden Labels `ubuntu-latest` konfiguriert.
-Verifizierte Node-24-basierte Action-Majors: checkout v5, setup-node v5, setup-python v6, setup-java v5 und upload-artifact v6.
-Diese Action-Laufzeit ist von den Node-/Java-Versionen der Anwendung unabhängig.
-Die Deprecation-Warnungen des ursprünglichen Laufs belegen nicht die Ursache des Maven-Fehlers.
-Für strengere Supply-Chain-Kontrolle sollten Action-Commit-SHAs separat geprüft und fixiert werden.
-
-## Durchgeführte Prüfungen
-
-- Java-21-Kern: 216 Prüfungen bestanden; die Kernimplementierung blieb unverändert.
-- Frontend: 31 Tests bestanden.
-- Neue Chromium-CSP-Regression: 8 Tests bestanden, keine übersprungen.
-- Bestehende UI-Suite mit ausdrücklicher DOM/HTTP-Bridge: 116 Prüfungen bestanden.
-- Release-Gate: 14 Tests; Restore: 12; Signatur-CLI: 4 bestanden.
-- Workflow-YAML/Bash sowie simulierter Maven-Exit-Status und Protokollierung: 7 Prüfungen bestanden. Kein Maven-Build.
-
-Native HTTP-Navigation wurde versucht und durch die Umgebung mit `ERR_BLOCKED_BY_ADMINISTRATOR` blockiert.
-Maven und JDK 25 sind hier nicht installiert; Maven Central ist nicht auflösbar.
-**Ein erfolgreicher nativer Browserlauf, Maven-Reactor, Java-25-Lauf oder GitHub-Lauf wird nicht behauptet.**
-Siehe [maschinellen Patchbericht](../qa/ci-hotfix-validation.json).
-
-## Referenzen
-
+- [Tomcat-Connector](https://tomcat.apache.org/tomcat-11.0-doc/config/http.html).
+- [Servlet-API](https://tomcat.apache.org/tomcat-11.0-doc/servletapi/jakarta/servlet/http/HttpServletRequest.html).
+- [StrictHttpFirewall](https://docs.spring.io/spring-security/reference/api/java/org/springframework/security/web/firewall/StrictHttpFirewall.html).
+- [Spring-Security-Implementierung](https://github.com/spring-projects/spring-security/blob/main/web/src/main/java/org/springframework/security/web/firewall/StrictHttpFirewall.java).
 - [Playwright Locator-Assertions](https://playwright.dev/python/docs/api/class-locatorassertions).
-- [Playwright-1.57.0-Polling-Implementierung](https://github.com/microsoft/playwright/blob/v1.57.0/packages/playwright-core/src/server/frames.ts).
-- [Maven-Surefire-Parameter](https://maven.apache.org/surefire/maven-surefire-plugin/test-mojo.html).
-- [GitHub-CLI-Jobprotokolle](https://cli.github.com/manual/gh_run_view).

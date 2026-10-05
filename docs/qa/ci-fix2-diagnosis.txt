@@ -1,0 +1,46 @@
+Graph Atlas - CI failure diagnosis (2026-10-05)
+
+Source: user-uploaded logs_101023669665.zip.
+Reported run: 37298864318.
+Checkout commit: c25472be9f32415f199cdedd0664105d09bd6676.
+
+Java 21 and Java 25 have the same failure:
+  Spring Boot: 4.1.1.
+  Embedded Tomcat: 11.0.24.
+  CoreRegressionTest: 4 JUnit tests, 0 failures, 0 errors, 0 skipped.
+  Server module: 20 tests, 1 failure, 0 errors, 0 skipped.
+  Passing server classes:
+    LocalizationMvcTest: 12/12.
+    SecurityAndMvcTest: 4/4.
+    ReleaseMvcTest: 2/2.
+  TomcatWireTest: 1 passing test and 1 failing test.
+  Failure: streamingRangesScopedPathsAndStatelessAuthentication, line 74.
+  Request from corresponding delivered source:
+    PUT /repository/npm-hosted/@wire%2Fdemo
+  Expected HTTP status: 201.
+  Actual HTTP status: 400.
+  Response: BAD_PATH / Request rejected by the HTTP firewall.
+
+These are assertion failures after successful compilation and application
+startup, not a missing Java installation, unresolved dependencies, a compile
+error, or a Spring ApplicationContext startup failure in this supplied run.
+Maven stopped at the test phase. Later packaging and integration steps were
+not reached; the supplied log does not establish that they pass.
+
+Source inspection + documented framework behavior:
+  The connector used encodedSolidusHandling=passthrough.
+  This leaves %2F in the servlet mapping path. StrictHttpFirewall rejects a
+  residual '%' in servletPath/pathInfo even with allowUrlEncodedSlash=true.
+  Change the connector to encodedSolidusHandling=decode.
+  Keep encodedReverseSolidusHandling=reject and the strict firewall.
+  getRequestURI() is still raw; RequestAuditFilter validates that URI before
+  the security chains with the existing one-pass RequestPaths policy.
+
+The source/browser job has the separately reported CSP failure:
+  tests/ui_test.py:279, Page.wait_for_function,
+  EvalError: unsafe-eval is not allowed by script-src 'self'.
+The cumulative source includes the previously supplied locator-assertion fix.
+
+Post-fix full Maven / Tomcat / Java 25 / GitHub CI has NOT been run in the
+assistant's environment. Consult docs/en/ci-troubleshooting.md and the new
+validation report for tests that were actually executed locally.

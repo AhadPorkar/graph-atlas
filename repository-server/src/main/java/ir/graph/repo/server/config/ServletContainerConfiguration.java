@@ -10,8 +10,11 @@ import org.springframework.context.annotation.*;
 public class ServletContainerConfiguration {
     @Bean WebServerFactoryCustomizer<TomcatServletWebServerFactory> packagePathSupport() {
         return factory -> factory.addConnectorCustomizers(connector -> {
-            // npm sends @scope%2fname. We decode once in RequestPaths, not in the connector.
-            connector.setEncodedSolidusHandling("passthrough");
+            // npm sends @scope%2Fname. Spring Security needs a decoded servletPath:
+            // passthrough leaves '%' there, which StrictHttpFirewall correctly rejects.
+            // getRequestURI() stays raw. RequestAuditFilter validates that original
+            // URI with RequestPaths before security routing; do not decode servletPath again.
+            connector.setEncodedSolidusHandling("decode");
             connector.setEncodedReverseSolidusHandling("reject");
         });
     }

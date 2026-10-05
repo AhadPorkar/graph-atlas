@@ -74,9 +74,47 @@ class TomcatWireTest {
             assertEquals(201, published.statusCode(), () -> new String(published.body(), StandardCharsets.UTF_8));
             var metadata = request(client, "GET", "/repository/npm-hosted/@wire%2fdemo", null, "Authorization", auth);
             assertEquals(200, metadata.statusCode()); assertEquals("@wire/demo", json(metadata).get("name"));
+            for (String path : List.of("@wire%2Fdemo", "@wire/demo", "%40wire%2Fdemo")) {
+                var alternate = request(client, "GET", "/repository/npm-hosted/" + path, null, "Authorization", auth);
+                assertEquals(200, alternate.statusCode(), () -> path + ": " + new String(alternate.body(), StandardCharsets.UTF_8));
+                assertEquals("@wire/demo", json(alternate).get("name"));
+            }
             for (String path : List.of("a/%252e%252e/secret", "%2e%2e%2fsecret", "a//b"))
                 assertEquals(400, request(client, "GET", "/repository/raw-hosted/" + path, null, "Authorization", auth).statusCode(), path);
             assertEquals(400, request(client, "GET", "/api%2frepos", null, "Authorization", auth).statusCode());
+        }
+    }
+
+    @Test void encodedArtifactPathsPreserveIdentityAndPlus() throws Exception {
+        try (var client = HttpClient.newHttpClient()) {
+            byte[] content = "encoded slash and literal plus".getBytes(StandardCharsets.UTF_8);
+            var put = request(client, "PUT", "/repository/raw-hosted/path-test%2Ffile+name.txt", content,
+                    "Authorization", basic(), "Content-Type", "application/octet-stream");
+            assertEquals(201, put.statusCode(), () -> new String(put.body(), StandardCharsets.UTF_8));
+            for (String path : List.of("path-test/file+name.txt", "path-test%2Ffile+name.txt", "path-test%2ffile+name.txt")) {
+                var get = request(client, "GET", "/repository/raw-hosted/" + path, null, "Authorization", basic());
+                assertEquals(200, get.statusCode(), path);
+                assertArrayEquals(content, get.body(), path);
+            }
+        }
+    }
+
+    @Test void ambiguousPathsRemainRejectedBeforeAuthentication() throws Exception {
+        // These requests must fail even if the container normalizes its mapping path.
+        // The raw URI guard runs before credentials, security-chain selection and MVC.
+        var paths = List.of(
+                "/api%2frepos", "/api%2Frepos", "/v2%2fcatalog",
+                "/repository%2fraw-hosted/secret", "/repository/raw-hosted%2fsecret",
+                "/repository/raw-hosted%2ffolder/file", "/repository/raw-hosted/a%2f%2fb",
+                "/repository/raw-hosted/..%2f..%2fapi/repos",
+                "/repository/raw-hosted/a%2f../secret", "/repository/raw-hosted/.%2e/secret",
+                "/repository/raw-hosted/a/%252e%252e/secret", "/repository/raw-hosted/%252Fsecret",
+                "/repository/raw-hosted/a%5cb", "/repository/raw-hosted/a%3bb", "/repository/raw-hosted/a//b");
+        try (var client = HttpClient.newHttpClient()) {
+            for (String path : paths) {
+                assertEquals(400, request(client, "GET", path, null).statusCode(), "Anonymous: " + path);
+                assertEquals(400, request(client, "GET", path, null, "Authorization", basic()).statusCode(), "Authenticated: " + path);
+            }
         }
     }
 }

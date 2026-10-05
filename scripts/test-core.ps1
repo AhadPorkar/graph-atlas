@@ -10,6 +10,7 @@ $Files += 'repository-core/src/test/java/ir/graph/repo/core/SelfTest.java'
 $Files += 'repository-core/src/test/java/ir/graph/repo/core/CoreContractTestMain.java'
 $Files += 'repository-core/src/test/java/ir/graph/repo/core/LocalizationTestMain.java'
 $Files += 'repository-core/src/test/java/ir/graph/repo/core/ReleaseContractTestMain.java'
+$Files += 'repository-core/src/test/java/ir/graph/repo/core/RequestPathPolicyTestMain.java'
 [System.IO.File]::WriteAllLines("$Build/sources.txt", $Files, [System.Text.UTF8Encoding]::new($false))
 & javac --release 21 -encoding UTF-8 -d "$Build/classes" "@$Build/sources.txt"
 if ($LASTEXITCODE -ne 0) { throw 'Core compilation failed.' }
@@ -22,4 +23,6 @@ if ($LASTEXITCODE -ne 0) { throw 'Core protocol tests failed.' }
 if ($LASTEXITCODE -ne 0) { throw 'Language checks failed.' }
 & java -cp "$Build/classes" ir.graph.repo.core.ReleaseContractTestMain
 if ($LASTEXITCODE -ne 0) { throw 'Release assurance tests failed.' }
+& java -cp "$Build/classes" ir.graph.repo.core.RequestPathPolicyTestMain
+if ($LASTEXITCODE -ne 0) { throw 'Raw URI policy checks failed.' }
 Write-Host 'Core-only checks passed. Spring Boot was NOT compiled or started by this script.'

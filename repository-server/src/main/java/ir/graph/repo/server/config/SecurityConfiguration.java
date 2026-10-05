@@ -39,7 +39,9 @@ public class SecurityConfiguration {
     @Bean WebSecurityCustomizer firewall() {
         var firewall = new StrictHttpFirewall();
         firewall.setAllowUrlEncodedSlash(true);
-        // All other strict firewall protections remain enabled; RequestPaths additionally validates decoded segments.
+        // Tomcat decodes servlet mapping paths, but getRequestURI() remains raw.
+        // RequestAuditFilter validates that raw URI before this firewall. Keep percent,
+        // double-slash, backslash, semicolon and traversal protections enabled.
         return web -> web.httpFirewall(firewall).requestRejectedHandler((request, response, ex) ->
                 errors.write(request, response, 400, "BAD_PATH", "Request rejected by the HTTP firewall"));
     }

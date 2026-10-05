@@ -1,0 +1,115 @@
+{
+  "recordedAt": "2026-10-05",
+  "repair": "CI fix 2: canonical Tomcat servlet paths with raw URI validation; cumulative CSP fix",
+  "userLogArchive": {
+    "file": "logs_101023669665.zip",
+    "sha256": "05e8cfbe712c30fd254ca4f13b26d08cef3ff5fa2382c6b30938b9700e0f45d7",
+    "run": 37298864318,
+    "reportedCommit": "c25472be9f32415f199cdedd0664105d09bd6676"
+  },
+  "sourceBaselines": {
+    "initialSourceSha256": "cb6b94870340f1c0d80a7acfe98519f76d0c8e96ff5230cdff80aca0d9ea64a8",
+    "previousCspHotfixSha256": "0632210e7de315c8669b3eb6972c2e5f0707279c2c90ab52b183248fa300b7c8",
+    "remoteSourceIndependentlyFetched": false
+  },
+  "observedPreFixUserCi": {
+    "java21": {
+      "compiled": true,
+      "applicationStarted": true,
+      "coreJUnitTests": 4,
+      "coreFailures": 0,
+      "serverJUnitTests": 20,
+      "serverFailures": 1,
+      "serverErrors": 0,
+      "serverSkipped": 0
+    },
+    "java25": {
+      "compiled": true,
+      "applicationStarted": true,
+      "coreJUnitTests": 4,
+      "coreFailures": 0,
+      "serverJUnitTests": 20,
+      "serverFailures": 1,
+      "serverErrors": 0,
+      "serverSkipped": 0
+    },
+    "springBoot": "4.1.1",
+    "tomcat": "11.0.24",
+    "failure": "TomcatWireTest.streamingRangesScopedPathsAndStatelessAuthentication:74",
+    "request": "PUT /repository/npm-hosted/@wire%2Fdemo",
+    "expectedStatus": 201,
+    "actualStatus": 400,
+    "errorCode": "BAD_PATH",
+    "browserFailure": "Page.wait_for_function EvalError caused by restrictive CSP",
+    "laterIntegrationStepsReached": false
+  },
+  "productionChange": {
+    "encodedSolidusHandling": {
+      "before": "passthrough",
+      "after": "decode"
+    },
+    "encodedReverseSolidusHandling": "reject; unchanged",
+    "strictFirewallEnabled": true,
+    "allowUrlEncodedSlash": "true; unchanged",
+    "allowUrlEncodedPercent": "false default; unchanged",
+    "rawUriGuard": "RequestAuditFilter calls RequestPaths.decode(getRequestURI()) before security chains; unchanged",
+    "springBootVersionChanged": false,
+    "javaTargetChanged": false,
+    "unsafeEvalAdded": false,
+    "cspBypassed": false,
+    "testsSkipped": false,
+    "failuresIgnored": false
+  },
+  "executedLocalTests": {
+    "javaRuntime": "OpenJDK 21.0.11",
+    "core": {
+      "passed": 246,
+      "existing": 216,
+      "newRawUriPolicyChecks": 30,
+      "fullSpringBoot": false
+    },
+    "frontend": {
+      "passed": 31
+    },
+    "cspAssertions": {
+      "passed": 8,
+      "scope": "real Chromium with restrictive meta CSP; not HTTP navigation"
+    },
+    "uiBridge": {
+      "passed": 116,
+      "scope": "DOM + synthetic HTTP bridge; not native CSP/cookies or Spring"
+    },
+    "releaseGateClient": {
+      "passed": 14
+    },
+    "restoreHelper": {
+      "passed": 12
+    },
+    "evidenceVerifier": {
+      "passed": 4
+    },
+    "javaSyntax": {
+      "files": 75,
+      "scope": "parser only, no framework dependencies or compilation"
+    },
+    "sourceStructure": {
+      "checks": 3304,
+      "failures": 0
+    }
+  },
+  "writtenNotExecutedHere": {
+    "ServletPathFirewallTest": "3 JUnit methods",
+    "TomcatWireTest": "original assertions retained; new URI variants and rejection checks added",
+    "fullPostFixMavenReactor": "not executed: Maven unavailable, Maven Central DNS fails",
+    "java25": "not installed locally",
+    "nativeUiNavigation": "attempted, blocked by ERR_BLOCKED_BY_ADMINISTRATOR",
+    "postFixHostedCi": "not executed by assistant",
+    "powershellUpdater": "not executed on Windows; patch payloads validated with Git on Linux"
+  },
+  "references": [
+    "https://tomcat.apache.org/tomcat-11.0-doc/config/http.html",
+    "https://tomcat.apache.org/tomcat-11.0-doc/servletapi/jakarta/servlet/http/HttpServletRequest.html",
+    "https://docs.spring.io/spring-security/reference/api/java/org/springframework/security/web/firewall/StrictHttpFirewall.html",
+    "https://github.com/spring-projects/spring-security/blob/main/web/src/main/java/org/springframework/security/web/firewall/StrictHttpFirewall.java"
+  ]
+}

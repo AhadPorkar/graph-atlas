@@ -40,7 +40,7 @@
   "releaseApprovalPolicy": "independent-reviewer",
   "automatedVulnerabilityScanning": false,
   "releaseGateIntegration": "explicit CI opt-in; not mandatory on package endpoints",
-  "actualCoreChecks": 216,
+  "actualCoreChecks": 246,
   "actualFrontendTests": 31,
   "actualBrowserFixtureChecks": 116,
   "actualGateClientTests": 14,
@@ -48,6 +48,29 @@
   "actualRestoreTests": 12,
   "newReleaseCoreChecks": 68,
   "bilingualGuidePairs": 20,
-  "ciHotfix": "CSP-safe locator assertions; full Java root cause pending logs",
-  "actualCspAssertionTests": 8
+  "ciHotfix": "CSP-safe locator assertions and Tomcat encoded-slash mapping; post-fix hosted CI pending",
+  "actualCspAssertionTests": 8,
+  "rawUriPolicyChecks": 30,
+  "providedCiEvidence": {
+    "archive": "logs_101023669665.zip",
+    "run": 37298864318,
+    "commit": "c25472be9f32415f199cdedd0664105d09bd6676",
+    "javaVersions": [
+      "21",
+      "25"
+    ],
+    "springBoot": "4.1.1",
+    "tomcat": "11.0.24",
+    "serverTestsPerMatrixJob": {
+      "run": 20,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    "failedTest": "TomcatWireTest.streamingRangesScopedPathsAndStatelessAuthentication:74",
+    "failedRequest": "PUT /repository/npm-hosted/@wire%2Fdemo",
+    "expectedStatus": 201,
+    "actualStatus": 400,
+    "postFixCiExecuted": false
+  }
 }

@@ -4,9 +4,17 @@
 
 Recorded 2026-10-05. Results below refer to the delivered source, not a customer installation. Machine-readable and console evidence lives in [the QA directory](../qa/).
 
-## CI hotfix follow-up
+## CI repair follow-up
 
-The initial hosted CI run reported a CSP evaluation failure in browser polling and separate Maven job failures. The browser waits have been corrected; the Java root cause requires the missing failure log. See [CI troubleshooting and patch validation](ci-troubleshooting.md). Historical test results below remain limited to their stated scope.
+The uploaded CI logs now establish the pre-fix Java failure: the server compiled
+and started under both Java 21 and Java 25, with 19 of 20 server tests passing.
+Scoped npm publication returned 400 instead of 201 because of incompatible
+Tomcat servlet-path handling. The connector is corrected and additional path
+regressions are included. See [CI diagnosis and current validation](ci-troubleshooting.md).
+The new raw-URI suite adds 30 executed checks, bringing local core checks to 246.
+The corrected full Maven/Tomcat run remains pending; the observed pre-fix CI
+results must not be presented as post-fix validation. Historical results below
+retain their original scope.
 
 
 ## Executed

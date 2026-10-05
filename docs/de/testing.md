@@ -4,9 +4,15 @@
 
 Stand 05.10.2026. Die Ergebnisse betreffen diesen Quellcode, keine Kundeninstallation. Konsolenausgaben und strukturierte Ergebnisse stehen im [QA-Verzeichnis](../qa/).
 
-## CI-Hotfix-Nachtrag
+## CI-Korrektur: aktueller Befund
 
-Der erste gemeldete CI-Lauf scheiterte beim CSP-bezogenen Browser-Polling und in separaten Maven-Jobs. Die Browser-Assertions wurden korrigiert; zur Java-Ursache fehlt das Fehlerprotokoll. Siehe [CI-Diagnose und Patchprüfung](ci-troubleshooting.md). Historische Testergebnisse gelten weiterhin nur für ihren angegebenen Umfang.
+Die hochgeladenen CI-Protokolle belegen erfolgreiche Kompilierung und
+Anwendungsstarts unter Java 21 und 25 vor der Korrektur. Im Servermodul waren
+19 von 20 Tests erfolgreich; der npm-Scope-Pfad erhielt HTTP 400 statt 201.
+Der Tomcat-Connector ist korrigiert. Weitere 30 ausgeführte Originalpfad-Prüfungen
+bringen die lokalen Core-Prüfungen auf 246. Der neue vollständige Maven-/Tomcat-Lauf
+ist noch offen. Siehe [CI-Diagnose und Validierung](ci-troubleshooting.md).
+Historische Ergebnisse unten behalten ihren ursprünglichen Geltungsbereich.
 
 
 ## Durchgeführt
