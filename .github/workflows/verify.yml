@@ -45,7 +45,7 @@ jobs:
         run: python tests/ui_test.py
       - name: Upload browser evidence
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: browser-fixture-evidence
           path: |
@@ -118,7 +118,7 @@ jobs:
         run: python tests/integration.py
       - name: Upload results even on failure
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: java-${{ matrix.java }}-evidence
           path: |
