@@ -1,5 +1,5 @@
 # Official images. For a controlled release, pin reviewed image digests in your deployment.
-FROM maven:3.9-eclipse-temurin-25 AS build
+FROM maven:3-eclipse-temurin-24 AS build
 WORKDIR /workspace
 COPY pom.xml ./
 COPY repository-core/pom.xml repository-core/pom.xml
