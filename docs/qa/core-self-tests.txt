@@ -1,0 +1,48 @@
+PASS JSON Unicode and nested round-trip
+PASS Reject invalid JSON {"x":1,"x":2}
+PASS Reject invalid JSON 01
+PASS Reject invalid JSON [1,]
+PASS Reject invalid JSON {"x":}
+PASS Reject invalid JSON "raw newline"
+PASS Reject invalid JSON true false
+PASS Reject invalid JSON [NaN]
+PASS Reject invalid JSON {x:2}
+PASS Reject excessive nesting
+PASS Reject path traversal or ambiguity
+PASS Reject path traversal or ambiguity
+PASS Reject path traversal or ambiguity
+PASS Reject path traversal or ambiguity
+PASS Reject path traversal or ambiguity
+PASS Reject path traversal or ambiguity
+PASS Reject path traversal or ambiguity
+PASS Reject path traversal or ambiguity
+PASS Allow scoped npm path
+PASS Normalize NuGet version
+PASS Numeric semantic version ordering
+PASS Numeric prerelease ordering
+PASS Release sorts after prerelease
+PASS Normalize Python distribution name
+PASS PBKDF2 password verification
+PASS Reject incorrect password
+PASS Password is not persisted in plaintext
+PASS Reject public URL with unsupported context path
+PASS Prevent second process/store using the same data directory
+PASS SHA-256 blob digest
+PASS Content-addressed de-duplication
+PASS Reject redeployment of immutable content
+PASS Operator-set per-upload safety guard
+PASS Blob bytes match published data
+PASS Read multipart text field
+PASS Streaming multipart preserves binary nulls and false delimiter prefixes
+PASS Reject truncated multipart payload
+PASS Disallow insecure upstream by default
+PASS Disallow private upstream by default
+PASS Disallow non-HTTP upstream schemes
+PASS ContentStore 40,001 additional artifact references without a licensing quota
+PASS Metrics do not act as a daily-request licensing gate
+PASS Checkpoint truncates the WAL only after snapshot creation
+PASS Recover assets after restart
+PASS Recover committed deletion after checkpoint
+PASS Discard a simulated incomplete final WAL record
+PASS Verify referenced blob integrity after recovery
+JAVA_SELF_TESTS_PASSED=47

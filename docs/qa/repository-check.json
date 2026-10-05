@@ -1,0 +1,9 @@
+{
+  "checks": 3259,
+  "failures": 0,
+  "sourceFiles": 225,
+  "uiKeysPerLanguage": 381,
+  "bilingualGuidePairs": 19,
+  "localDocumentationLinks": 256,
+  "springBootCompiled": false
+}

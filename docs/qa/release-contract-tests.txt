@@ -1,0 +1,69 @@
+PASS Unauthenticated release listing rejected (UNAUTHORIZED)
+PASS Read-only users cannot freeze releases (FORBIDDEN)
+PASS Empty release rejected (BAD_REQUEST)
+PASS Duplicate asset reference rejected (BAD_REQUEST)
+PASS Missing asset rejected (NOT_FOUND)
+PASS Cross-repository authorization is all-or-nothing (FORBIDDEN)
+PASS Capsule starts in draft
+PASS History hash chain starts valid
+PASS Manifest fingerprint is reproducible
+PASS Release version cannot be replaced (RELEASE_EXISTS)
+PASS Unreadable capsules excluded from listing
+PASS Direct capsule access respects source permissions (FORBIDDEN)
+PASS Draft cannot pass deployment gate
+PASS Unsigned draft has no downloadable evidence (NO_EVIDENCE)
+PASS Draft pinned content cannot be downloaded (RELEASE_NOT_AVAILABLE)
+PASS Revision is mandatory (STALE_RELEASE)
+PASS Decision explanation is mandatory (BAD_REQUEST)
+PASS Submission advances to review
+PASS Even admin cannot self-approve (SELF_APPROVAL)
+PASS Write is not the approve permission (RELEASE_TRANSITION)
+PASS Stale reviewer cannot approve (STALE_RELEASE)
+PASS Independent reviewer approval succeeds
+PASS Approved release can be published
+PASS Ed25519 signature validates the frozen manifest
+PASS Signed evidence includes release decision history
+PASS External trusted fingerprint is mandatory
+PASS Modified evidence fails signature verification
+PASS Released capsule passes deep gate
+PASS Pinned delivery resolves frozen digest
+PASS Invalid pinned artifact index rejected (NOT_FOUND)
+PASS Storage insight excludes unreadable repository
+PASS Deduplication is measured from actual shared bytes
+PASS Host capacity is not disclosed to ordinary users
+PASS Administrators see actual file-system capacity
+PASS Quarantine registry is admin-only (FORBIDDEN)
+PASS Quarantine requires an explicit active state (BAD_REQUEST)
+PASS Digest hold persisted
+PASS Quarantine blocks normal binary GET (CONTENT_HELD)
+PASS Quarantine blocks HEAD (CONTENT_HELD)
+PASS Range request cannot bypass quarantine (CONTENT_HELD)
+PASS Conditional 304 cannot bypass quarantine (CONTENT_HELD)
+PASS Pinned release delivery also checks quarantine (CONTENT_HELD)
+PASS Quarantine fails a previously released deployment gate
+PASS New alias cannot bypass digest quarantine (CONTENT_HELD)
+PASS Stale hold resolution rejected (STALE_HOLD)
+PASS Explicit resolution restores digest availability
+PASS Gate recovers after authorized hold resolution
+PASS Source drift is reported; pinned delivery stays valid
+PASS Pinned bytes do not follow live-path replacement
+PASS Pinned historical bytes accounted separately
+PASS Garbage collection retains released content without live references
+PASS Unreferenced old blob is still collectible
+PASS Referenced repositories cannot be purged (RELEASE_REFERENCE)
+PASS Modified bytes fail the deep deployment gate
+PASS Maintenance verifies pinned-only content too
+PASS Release can be revoked with a reason
+PASS Revoked release fails gate
+PASS Revoked snapshot cannot be downloaded (RELEASE_NOT_AVAILABLE)
+PASS Offline signature is historical; revocation is an online check
+PASS Concurrent approvals commit exactly one revision
+PASS Reviewer can reject without author permission
+PASS Rejected release is terminal; a new version is required
+PASS Missing signing key fails closed when signed releases exist
+PASS Signing identity survives store restart
+PASS Release lifecycle survives snapshot and restart
+PASS Pinned blob survives compaction and restart
+PASS Resolved quarantine history is durable
+PASS Release history remains verifiable after restart
+RELEASE_CONTRACT_TESTS_PASSED=68

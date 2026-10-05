@@ -1,0 +1,196 @@
+TAP version 13
+# Subtest: release states are explicit and immutable
+ok 1 - release states are explicit and immutable
+  ---
+  duration_ms: 2.340537
+  type: 'test'
+  ...
+# Subtest: capture parses multiple formats without rewriting their paths
+ok 2 - capture parses multiple formats without rewriting their paths
+  ---
+  duration_ms: 0.44822
+  type: 'test'
+  ...
+# Subtest: empty capture input remains empty so the form can reject it
+ok 3 - empty capture input remains empty so the form can reject it
+  ---
+  duration_ms: 0.101539
+  type: 'test'
+  ...
+# Subtest: duplicate references cannot silently inflate a snapshot
+ok 4 - duplicate references cannot silently inflate a snapshot
+  ---
+  duration_ms: 0.19006
+  type: 'test'
+  ...
+# Subtest: capture rejects traversal, encoded paths, control characters and missing repositories
+ok 5 - capture rejects traversal, encoded paths, control characters and missing repositories
+  ---
+  duration_ms: 0.260994
+  type: 'test'
+  ...
+# Subtest: capsule names are never evaluated as JavaScript or markup by the parser
+ok 6 - capsule names are never evaluated as JavaScript or markup by the parser
+  ---
+  duration_ms: 0.130503
+  type: 'test'
+  ...
+# Subtest: every static delivery translation exists in all three catalogs
+ok 7 - every static delivery translation exists in all three catalogs
+  ---
+  duration_ms: 7.211794
+  type: 'test'
+  ...
+# Subtest: English is the explicit first-run default
+ok 8 - English is the explicit first-run default
+  ---
+  duration_ms: 0.982017
+  type: 'test'
+  ...
+# Subtest: browser regional locales normalize only when explicitly selected
+ok 9 - browser regional locales normalize only when explicitly selected
+  ---
+  duration_ms: 0.425707
+  type: 'test'
+  ...
+# Subtest: explicit query language wins over stored language
+ok 10 - explicit query language wins over stored language
+  ---
+  duration_ms: 0.204681
+  type: 'test'
+  ...
+# Subtest: invalid query falls back to a valid saved preference
+ok 11 - invalid query falls back to a valid saved preference
+  ---
+  duration_ms: 0.203059
+  type: 'test'
+  ...
+# Subtest: invalid persisted values cannot select a non-existent locale
+ok 12 - invalid persisted values cannot select a non-existent locale
+  ---
+  duration_ms: 0.131544
+  type: 'test'
+  ...
+# Subtest: denied localStorage is safe
+ok 13 - denied localStorage is safe
+  ---
+  duration_ms: 0.159245
+  type: 'test'
+  ...
+# Subtest: catalogs have identical keys and matching interpolation placeholders
+ok 14 - catalogs have identical keys and matching interpolation placeholders
+  ---
+  duration_ms: 3.406788
+  type: 'test'
+  ...
+# Subtest: English and German catalogs contain no Persian UI remnants
+ok 15 - English and German catalogs contain no Persian UI remnants
+  ---
+  duration_ms: 0.51575
+  type: 'test'
+  ...
+# Subtest: selected language is persisted without storing credentials
+ok 16 - selected language is persisted without storing credentials
+  ---
+  duration_ms: 1.518216
+  type: 'test'
+  ...
+# Subtest: blocked storage does not prevent changing language
+ok 17 - blocked storage does not prevent changing language
+  ---
+  duration_ms: 1.074623
+  type: 'test'
+  ...
+# Subtest: English and German are LTR; Persian is RTL
+ok 18 - English and German are LTR; Persian is RTL
+  ---
+  duration_ms: 2.278356
+  type: 'test'
+  ...
+# Subtest: regional number formatting is applied
+ok 19 - regional number formatting is applied
+  ---
+  duration_ms: 19.404644
+  type: 'test'
+  ...
+# Subtest: dates are localized; malformed dates cannot break a page
+ok 20 - dates are localized; malformed dates cannot break a page
+  ---
+  duration_ms: 6.215175
+  type: 'test'
+  ...
+# Subtest: size units stay technically recognizable in all languages
+ok 21 - size units stay technically recognizable in all languages
+  ---
+  duration_ms: 2.176656
+  type: 'test'
+  ...
+# Subtest: singular and plural labels use Intl.PluralRules
+ok 22 - singular and plural labels use Intl.PluralRules
+  ---
+  duration_ms: 1.675058
+  type: 'test'
+  ...
+# Subtest: missing selected-locale keys fall back to English
+ok 23 - missing selected-locale keys fall back to English
+  ---
+  duration_ms: 0.118765
+  type: 'test'
+  ...
+# Subtest: interpolation never reads inherited object properties
+ok 24 - interpolation never reads inherited object properties
+  ---
+  duration_ms: 0.070514
+  type: 'test'
+  ...
+# Subtest: failed lazy catalog load retains the previous language
+ok 25 - failed lazy catalog load retains the previous language
+  ---
+  duration_ms: 0.484083
+  type: 'test'
+  ...
+# Subtest: initial selected-catalog failure still permits the English UI
+ok 26 - initial selected-catalog failure still permits the English UI
+  ---
+  duration_ms: 0.308104
+  type: 'test'
+  ...
+# Subtest: a slower selection cannot overwrite the most recent selection
+ok 27 - a slower selection cannot overwrite the most recent selection
+  ---
+  duration_ms: 7.192065
+  type: 'test'
+  ...
+# Subtest: malformed catalog data is rejected
+ok 28 - malformed catalog data is rejected
+  ---
+  duration_ms: 0.582908
+  type: 'test'
+  ...
+# Subtest: client examples never publish to proxy or group repositories
+ok 29 - client examples never publish to proxy or group repositories
+  ---
+  duration_ms: 1.802586
+  type: 'test'
+  ...
+# Subtest: hosted examples retain token environment references in all languages
+ok 30 - hosted examples retain token environment references in all languages
+  ---
+  duration_ms: 1.973697
+  type: 'test'
+  ...
+# Subtest: shell and XML values in generated examples are escaped
+ok 31 - shell and XML values in generated examples are escaped
+  ---
+  duration_ms: 0.596008
+  type: 'test'
+  ...
+1..31
+# tests 31
+# suites 0
+# pass 31
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 114.575708

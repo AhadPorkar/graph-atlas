@@ -1,0 +1,88 @@
+name: Verify
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-and-ui:
+    name: Source, translations and browser fixtures
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Check repository structure and bilingual documentation
+        run: python scripts/check_repository.py
+      - name: Test frontend without installing runtime packages
+        run: npm test
+      - name: Test the fail-closed release gate client
+        run: python tests/release_gate_test.py
+      - name: Test the offline restore helper
+        run: python tests/restore_test.py
+      - name: Install browser test tools
+        run: |
+          python -m pip install -r tests/requirements.txt
+          python -m playwright install --with-deps chromium
+      - name: Test native browser navigation against synthetic fixtures
+        run: python tests/ui_test.py
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-fixture-evidence
+          path: |
+            docs/qa/browser-report.json
+            docs/assets/*.png
+
+  java:
+    name: Spring Boot / Java ${{ matrix.java }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ['21', '25']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+          cache: maven
+      - name: Compile and test the real Maven reactor
+        run: mvn -B -ntp -Djava.version=${{ matrix.java }} clean verify
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install HTTP test dependencies
+        run: python -m pip install -r tests/requirements.txt
+      - name: Verify the standalone signed-evidence tool
+        run: python tests/evidence_cli_test.py
+      - name: Exercise the real server and available npm/pip clients
+        run: python tests/integration.py
+      - name: Upload results even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-${{ matrix.java }}-evidence
+          path: |
+            repository-core/target/surefire-reports/
+            repository-server/target/surefire-reports/
+            docs/qa/*report.json

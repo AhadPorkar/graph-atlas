@@ -1,0 +1,16 @@
+{
+  "name": "graph-atlas-console",
+  "version": "0.5.0",
+  "private": true,
+  "type": "module",
+  "description": "Dependency-free multilingual administration console for Graph Atlas.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test tests/frontend/*.test.mjs",
+    "test:ui": "python tests/ui_test.py",
+    "check:repository": "python scripts/check_repository.py"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,79 @@
+PASS Bootstrap administrator authenticates
+PASS Invalid password is rejected
+PASS Default hosted repositories are seeded once
+PASS Supplied bootstrap password is not written in plaintext
+PASS Opaque API token authenticates
+PASS Raw API token is never stored
+PASS API token works as a Basic password
+PASS API token cannot create a password-login session
+PASS Last administrator cannot be deleted
+PASS User listings never expose password hashes
+PASS Non-admin cannot create repositories
+PASS Repository write permission is enforced
+PASS Private repositories require authentication
+PASS Raw upload is persisted
+PASS Raw download preserves bytes
+PASS HEAD does not emit an artifact body
+PASS Byte-range download is correct
+PASS Unsatisfiable range is rejected
+PASS Conditional download honors ETag
+PASS Immutable redeployment is rejected
+PASS Reader can download an allowed artifact
+PASS Maven release upload works
+PASS Maven SHA-256 sidecar is generated
+PASS Maven release policy rejects snapshots
+PASS Maven snapshot policy accepts snapshots
+PASS Group downloads resolve a member
+PASS Groups reject publishing
+PASS Referenced repository cannot be deleted
+PASS Group cycles are rejected
+PASS npm publication works
+PASS npm packument is available
+PASS npm latest tag resolves a version
+PASS Scoped npm publication works after one decoding pass
+PASS Scoped npm metadata can be read
+PASS npm duplicate version is rejected
+PASS npm tarball is available
+PASS npm dist-tag update works
+PASS Python multipart upload works
+PASS PyPI Simple HTML includes hashes
+PASS PyPI Simple JSON is available
+PASS Python wheel bytes are preserved
+PASS PyPI yanked metadata is emitted
+PASS NuGet nupkg publication works
+PASS NuGet V3 service discovery works
+PASS NuGet version index is available
+PASS NuGet flat-container download preserves bytes
+PASS NuGet registration includes dependency groups
+PASS NuGet nuspec external entities are rejected
+PASS NuGet unlist works
+PASS NuGet unlisted state is reflected in registration
+PASS OCI registry probe works
+PASS OCI upload session starts
+PASS OCI chunk upload commits an offset
+PASS OCI blob finalization checks digest
+PASS OCI blob download preserves bytes
+PASS OCI manifest publication validates referenced content
+PASS OCI tags are listed
+PASS OCI catalog is filtered through readable repositories
+PASS Reject ambiguous path: /repository/raw-hosted/../a
+PASS Reject ambiguous path: /repository/raw-hosted/%2e%2e/a
+PASS Reject ambiguous path: /repository/raw-hosted/%252e%252e/a
+PASS Reject ambiguous path: /repository/raw-hosted/%5ca
+PASS Reject ambiguous path: /api%2flogin
+PASS Reject ambiguous path: /repository/raw-hosted/a//b
+PASS Reject ambiguous path: /repository/raw-hosted/%c0%af
+PASS Path decoding does not turn plus into space
+PASS Administrative stats have no license quota gate
+PASS Request metric above one million does not block reads
+PASS Disable and re-enable does not resurrect an old session
+PASS Disable and re-enable does not resurrect old API tokens
+PASS Password change invalidates previously saved session identity
+PASS Password change revokes API tokens atomically
+PASS New password authenticates
+PASS All published blobs pass integrity verification
+Backup created: /tmp/graph-core-contract-2088761645890290641/backup.zip
+PASS Offline backup is generated outside the data directory
+PASS Migrated storage survives close and reopen
+PASS Reopened storage retains blob integrity
+CORE_CONTRACT_TESTS_PASSED=77

@@ -1,0 +1,23 @@
+name: Feature request / Funktionswunsch
+description: Explain the use case and trade-offs / Anwendungsfall und Kompromisse beschreiben.
+title: "[Feature] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / Problemstellung
+      description: Who needs this, and why? / Wer benötigt dies und warum?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal / Vorschlag
+      description: Include alternatives, security and compatibility impact.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance checks / Abnahmeprüfungen
+      description: Describe observable behavior, not only a screenshot.

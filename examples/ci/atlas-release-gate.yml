@@ -1,0 +1,30 @@
+# Copy into .github/workflows only after setting variables, secret and protected environment.
+# Manual workflow: never expose a deployment token to arbitrary pull_request code.
+name: Check Atlas release before deployment
+on:
+  workflow_dispatch:
+    inputs:
+      release_id:
+        description: Immutable Atlas release UUID
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Require current release approval and deep integrity verification
+        env:
+          GR_TOKEN: ${{ secrets.ATLAS_READ_TOKEN }}
+          ATLAS_BASE_URL: ${{ vars.ATLAS_BASE_URL }}
+          RELEASE_ID: ${{ inputs.release_id }}
+        run: python scripts/release_gate.py --base-url "$ATLAS_BASE_URL" --release "$RELEASE_ID"
+      # Add your deployment step here. Use pinned /api/releases/{id}/assets/{index}
+      # downloads and verify each hash against a receipt trusted out of band.
+      # A passed gate is point-in-time, not a lock against subsequent revocation.

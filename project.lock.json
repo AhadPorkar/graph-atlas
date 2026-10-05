@@ -1,0 +1,51 @@
+{
+  "projectVersion": "0.5.0-preview",
+  "framework": "Spring Boot",
+  "springBootVersion": "4.1.1",
+  "versionCheckedAt": "2026-10-05",
+  "parent": "org.springframework.boot:spring-boot-starter-parent:4.1.1",
+  "defaultJavaRelease": 25,
+  "compatibilityProfile": "java21",
+  "actualCoreTestRuntime": "OpenJDK 21.0.11",
+  "springBootBuildExecutedInDeliveryEnvironment": false,
+  "java25ExecutedInDeliveryEnvironment": false,
+  "commercialUsageQuotas": false,
+  "legacyStandaloneDataVersion": "0.2.0",
+  "dataBackend": "single-node SHA-256 blobs plus transactional JSONL WAL and snapshot",
+  "sources": [
+    "https://spring.io/projects/spring-boot/",
+    "https://docs.spring.io/spring-boot/system-requirements.html",
+    "https://github.com/spring-projects/spring-boot/releases/tag/v4.1.1"
+  ],
+  "defaultLanguage": "en",
+  "supportedLanguages": [
+    "en",
+    "de",
+    "fa"
+  ],
+  "documentationLanguages": [
+    "en",
+    "de"
+  ],
+  "uiCatalogKeysPerLanguage": 381,
+  "localizedAdministrativeErrorCodes": 57,
+  "actualFrontendTestRuntime": "Node 22.16.0",
+  "browserVerificationMode": "DOM + synthetic HTTP bridge; native navigation blocked",
+  "browserSpringRuntimeVerified": false,
+  "nativeBrowserCspAndCookiesVerified": false,
+  "product": "Graph Atlas",
+  "productNameTrademarkCleared": false,
+  "releaseEvidenceFormat": "graph-atlas.evidence/v1",
+  "releaseEvidenceAlgorithm": "Ed25519",
+  "releaseApprovalPolicy": "independent-reviewer",
+  "automatedVulnerabilityScanning": false,
+  "releaseGateIntegration": "explicit CI opt-in; not mandatory on package endpoints",
+  "actualCoreChecks": 216,
+  "actualFrontendTests": 31,
+  "actualBrowserFixtureChecks": 116,
+  "actualGateClientTests": 14,
+  "actualEvidenceCliTests": 4,
+  "actualRestoreTests": 12,
+  "newReleaseCoreChecks": 68,
+  "bilingualGuidePairs": 19
+}

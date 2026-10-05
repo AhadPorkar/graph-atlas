@@ -1,0 +1,39 @@
+name: Package candidate (manual)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python scripts/check_repository.py
+      - run: npm test
+      - run: bash scripts/build.sh
+      - name: Create the source distribution
+        run: python scripts/package_source.py --output dist/graph-atlas-source.zip
+      - name: Upload candidate files (does not create a public release)
+        uses: actions/upload-artifact@v4
+        with:
+          name: graph-atlas-candidate
+          path: |
+            dist/graph-repository.jar
+            dist/graph-repository.jar.sha256
+            dist/graph-atlas-source.zip
+            dist/graph-atlas-source.zip.sha256

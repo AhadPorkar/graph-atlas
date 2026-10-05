@@ -1,0 +1,26 @@
+[Unit]
+Description=Graph Repository
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=graph-repository
+Group=graph-repository
+WorkingDirectory=/opt/graph-repository
+EnvironmentFile=/etc/graph-repository/repository.env
+# Point this path at your actual JDK/JRE 25 installation.
+ExecStart=/opt/java25/bin/java -jar /opt/graph-repository/graph-repository.jar
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=45
+SuccessExitStatus=143
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/graph-repository
+
+[Install]
+WantedBy=multi-user.target

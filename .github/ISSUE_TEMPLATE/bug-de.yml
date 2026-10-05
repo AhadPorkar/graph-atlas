@@ -1,0 +1,37 @@
+name: Fehlerbericht (Deutsch)
+description: Reproduzierbaren Fehler ohne private Daten melden.
+title: '[Bug] '
+body:
+- type: markdown
+  attributes:
+    value: Sicherheitsprobleme vertraulich nach der Sicherheitsrichtlinie melden.
+- type: textarea
+  id: summary
+  attributes:
+    label: Zusammenfassung
+    description: Was ist passiert und was wurde erwartet?
+  validations:
+    required: true
+- type: textarea
+  id: environment
+  attributes:
+    label: Umgebung
+    description: Commit, JDK, Maven, Betriebssystem, Browser, Sprache und Paketclient-Versionen.
+  validations:
+    required: true
+- type: textarea
+  id: reproduction
+  attributes:
+    label: Reproduktion
+    description: Minimale Schritte, bereinigte Befehle und Ausgabe. Keine Geheimnisse
+      angeben.
+  validations:
+    required: true
+- type: textarea
+  id: verification
+  attributes:
+    label: Prüfung
+    description: Welche Tests wurden ausgeführt? Fehlgeschlagene und nicht ausgeführte
+      Prüfungen nennen.
+  validations:
+    required: false

@@ -1,0 +1,37 @@
+name: Bug report (English)
+description: Report a reproducible defect without private data.
+title: '[Bug] '
+body:
+- type: markdown
+  attributes:
+    value: 'Security issues: use the private reporting policy, not this form.'
+- type: textarea
+  id: summary
+  attributes:
+    label: Summary
+    description: What happened and what did you expect?
+  validations:
+    required: true
+- type: textarea
+  id: environment
+  attributes:
+    label: Environment
+    description: Commit, JDK, Maven, OS, browser, selected language and package client
+      versions.
+  validations:
+    required: true
+- type: textarea
+  id: reproduction
+  attributes:
+    label: Reproduction
+    description: Minimal steps, sanitized commands and observed output. Do not include
+      secrets.
+  validations:
+    required: true
+- type: textarea
+  id: verification
+  attributes:
+    label: Verification
+    description: Which tests did you run? Include failed or unexecuted checks.
+  validations:
+    required: false

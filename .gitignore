@@ -1,0 +1,49 @@
+# Build output and local tooling
+**/target/
+.build/
+dist/
+node_modules/
+.venv/
+venv/
+**/__pycache__/
+*.py[cod]
+*.class
+*.jar
+*.log
+*.zip
+*.sha256
+!SOURCE-SHA256SUMS.txt
+
+# Runtime data and secrets (never commit)
+data/
+backups/
+.env
+.env.*
+!.env.example
+admin.password
+*.key
+*.pem
+*.p12
+*.pfx
+.npmrc
+NuGet.Config
+nuget.config
+
+# Editors and operating systems
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Runtime signing identity; never publish private key material.
+evidence-key.json
+
+
+data/
+backups/
+.env
+admin.password
+evidence-key.json
+dist/
+node_modules/

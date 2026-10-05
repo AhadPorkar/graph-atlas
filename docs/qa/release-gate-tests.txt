@@ -1,0 +1,19 @@
+test_ambiguous_origins_denied (__main__.GateTest.test_ambiguous_origins_denied) ... ok
+test_https_url_and_canonical_id (__main__.GateTest.test_https_url_and_canonical_id) ... ok
+test_inconsistent_allow_is_denied (__main__.GateTest.test_inconsistent_allow_is_denied) ... ok
+test_local_http_requires_explicit_override (__main__.GateTest.test_local_http_requires_explicit_override) ... ok
+test_missing_and_multiline_tokens_denied (__main__.GateTest.test_missing_and_multiline_tokens_denied) ... ok
+test_real_http_allow_and_token_header (__main__.GateTest.test_real_http_allow_and_token_header) ... ok
+test_real_http_denial (__main__.GateTest.test_real_http_denial) ... ok
+test_redirects_are_not_followed (__main__.GateTest.test_redirects_are_not_followed) ... ok
+test_release_path_injection_denied (__main__.GateTest.test_release_path_injection_denied) ... ok
+test_remote_http_denied_even_with_local_override (__main__.GateTest.test_remote_http_denied_even_with_local_override) ... ok
+test_shallow_response_is_denied (__main__.GateTest.test_shallow_response_is_denied) ... ok
+test_string_booleans_are_denied (__main__.GateTest.test_string_booleans_are_denied) ... ok
+test_unauthorized_is_not_a_pass (__main__.GateTest.test_unauthorized_is_not_a_pass) ... ok
+test_wrong_release_is_denied (__main__.GateTest.test_wrong_release_is_denied) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.530s
+
+OK

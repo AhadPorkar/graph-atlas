@@ -1,0 +1,30 @@
+services:
+  repository:
+    build: .
+    image: graph-repository:0.4.0-dev
+    restart: unless-stopped
+    ports:
+      # Safe local binding; put an HTTPS reverse proxy in front for network access.
+      - "127.0.0.1:8081:8081"
+    environment:
+      GR_PUBLIC_URL: ${GR_PUBLIC_URL:-http://localhost:8081}
+      GR_COOKIE_SECURE: ${GR_COOKIE_SECURE:-false}
+      GR_MAX_UPLOAD_BYTES: ${GR_MAX_UPLOAD_BYTES:-0}
+      GR_MAX_JSON_BYTES: ${GR_MAX_JSON_BYTES:-67108864}
+      GR_CONCURRENT_REQUESTS: ${GR_CONCURRENT_REQUESTS:-0}
+      GR_MAX_CONNECTIONS: ${GR_MAX_CONNECTIONS:--1}
+      GR_ALLOW_PRIVATE_UPSTREAM: ${GR_ALLOW_PRIVATE_UPSTREAM:-false}
+      GR_ALLOW_HTTP_UPSTREAM: ${GR_ALLOW_HTTP_UPSTREAM:-false}
+      GR_LOGIN_FAILURE_LIMIT: ${GR_LOGIN_FAILURE_LIMIT:-10}
+      GR_LOGIN_FAILURE_WINDOW: ${GR_LOGIN_FAILURE_WINDOW:-60s}
+      GR_BOOTSTRAP_PASSWORD: ${GR_BOOTSTRAP_PASSWORD:-}
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--XX:MaxRAMPercentage=70.0}
+    volumes:
+      - repository-data:/var/lib/graph-repository
+    stop_grace_period: 45s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+volumes:
+  repository-data:

@@ -1,0 +1,73 @@
+spring:
+  application:
+    name: graph-repository
+  messages:
+    basename: i18n.messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
+  threads:
+    virtual:
+      enabled: true
+  servlet:
+    multipart:
+      # Package adapters stream multipart themselves. No hidden framework upload-size threshold.
+      enabled: false
+  mvc:
+    log-request-details: false
+server:
+  address: ${GR_BIND:127.0.0.1}
+  port: ${GR_PORT:8081}
+  shutdown: graceful
+  forward-headers-strategy: none
+  servlet:
+    session:
+      timeout: 8h
+      tracking-modes: cookie
+      cookie:
+        name: gr_session
+        path: /api
+        http-only: true
+        same-site: strict
+        secure: ${GR_COOKIE_SECURE:false}
+  tomcat:
+    # These are operational guards, not daily/component licensing quotas.
+    max-connections: ${GR_MAX_CONNECTIONS:-1}
+    max-http-form-post-size: -1B
+    max-swallow-size: -1B
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+      roles: ADMIN
+  info:
+    env:
+      enabled: true
+info:
+  app:
+    name: Graph Atlas
+    version: 0.5.0-preview
+    license-quotas: false
+    engine: independent
+    framework: Spring Boot 4.1.1
+graph:
+  home: ${GR_HOME:data}
+  public-url: ${GR_PUBLIC_URL:http://localhost:${GR_PORT:8081}}
+  max-json-bytes: ${GR_MAX_JSON_BYTES:67108864}
+  max-upload-bytes: ${GR_MAX_UPLOAD_BYTES:0}
+  concurrent-requests: ${GR_CONCURRENT_REQUESTS:0}
+  allow-private-upstream: ${GR_ALLOW_PRIVATE_UPSTREAM:false}
+  allow-http-upstream: ${GR_ALLOW_HTTP_UPSTREAM:false}
+  bootstrap-password: ${GR_BOOTSTRAP_PASSWORD:}
+  cookie-secure: ${GR_COOKIE_SECURE:false}
+  login-failure-limit: ${GR_LOGIN_FAILURE_LIMIT:10}
+  login-failure-window: ${GR_LOGIN_FAILURE_WINDOW:60s}
+  command: ""
+  command-target: ""
+logging:
+  level:
+    root: INFO
+    org.springframework.security: INFO

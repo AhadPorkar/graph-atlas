@@ -1,0 +1,630 @@
+{
+  "repos": [
+    {
+      "name": "maven-releases",
+      "format": "maven",
+      "type": "hosted",
+      "online": true,
+      "anonymous": false,
+      "redeploy": false,
+      "assetCount": 1248,
+      "cacheSeconds": 3600,
+      "allowedHosts": [],
+      "members": [],
+      "versionPolicy": "mixed",
+      "upstream": ""
+    },
+    {
+      "name": "maven-central",
+      "format": "maven",
+      "type": "proxy",
+      "online": true,
+      "anonymous": false,
+      "redeploy": false,
+      "assetCount": 896,
+      "cacheSeconds": 3600,
+      "allowedHosts": [],
+      "members": [],
+      "versionPolicy": "mixed",
+      "upstream": "https://repo.maven.apache.org/maven2/"
+    },
+    {
+      "name": "npm-hosted",
+      "format": "npm",
+      "type": "hosted",
+      "online": true,
+      "anonymous": false,
+      "redeploy": false,
+      "assetCount": 372,
+      "cacheSeconds": 3600,
+      "allowedHosts": [],
+      "members": [],
+      "versionPolicy": "mixed",
+      "upstream": ""
+    },
+    {
+      "name": "npm-group",
+      "format": "npm",
+      "type": "group",
+      "online": true,
+      "anonymous": false,
+      "redeploy": false,
+      "assetCount": 0,
+      "cacheSeconds": 3600,
+      "allowedHosts": [],
+      "members": [
+        "npm-hosted"
+      ],
+      "versionPolicy": "mixed",
+      "upstream": ""
+    },
+    {
+      "name": "nuget-hosted",
+      "format": "nuget",
+      "type": "hosted",
+      "online": true,
+      "anonymous": false,
+      "redeploy": false,
+      "assetCount": 218,
+      "cacheSeconds": 3600,
+      "allowedHosts": [],
+      "members": [],
+      "versionPolicy": "mixed",
+      "upstream": ""
+    },
+    {
+      "name": "pypi-hosted",
+      "format": "pypi",
+      "type": "hosted",
+      "online": true,
+      "anonymous": false,
+      "redeploy": false,
+      "assetCount": 164,
+      "cacheSeconds": 3600,
+      "allowedHosts": [],
+      "members": [],
+      "versionPolicy": "mixed",
+      "upstream": ""
+    },
+    {
+      "name": "docker-hosted",
+      "format": "docker",
+      "type": "hosted",
+      "online": true,
+      "anonymous": false,
+      "redeploy": false,
+      "assetCount": 86,
+      "cacheSeconds": 3600,
+      "allowedHosts": [],
+      "members": [],
+      "versionPolicy": "mixed",
+      "upstream": ""
+    },
+    {
+      "name": "raw-hosted",
+      "format": "raw",
+      "type": "hosted",
+      "online": true,
+      "anonymous": false,
+      "redeploy": false,
+      "assetCount": 42,
+      "cacheSeconds": 3600,
+      "allowedHosts": [],
+      "members": [],
+      "versionPolicy": "mixed",
+      "upstream": ""
+    }
+  ],
+  "stats": {
+    "repositories": 8,
+    "assets": 3026,
+    "logicalBytes": 5427310837,
+    "requestsSinceStart": 12849
+  },
+  "assets": [
+    {
+      "repo": "maven-releases",
+      "path": "com/example/platform/2.4.0/platform-2.4.0.jar",
+      "size": 6240896,
+      "updated": "2026-10-05T08:30:00Z",
+      "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+    },
+    {
+      "repo": "npm-hosted",
+      "path": "@example/design-system/-/design-system-1.8.2.tgz",
+      "size": 385024,
+      "updated": "2026-10-05T07:15:00Z",
+      "sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+    },
+    {
+      "repo": "pypi-hosted",
+      "path": "example_tools-0.6.0-py3-none-any.whl",
+      "size": 57344,
+      "updated": "2026-10-04T15:10:00Z",
+      "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "admin": true,
+      "disabled": false,
+      "grants": {
+        "*": [
+          "read",
+          "write",
+          "delete"
+        ]
+      }
+    },
+    {
+      "username": "build-agent",
+      "admin": false,
+      "disabled": false,
+      "grants": {
+        "npm-hosted": [
+          "read",
+          "write"
+        ]
+      }
+    }
+  ],
+  "tokens": [
+    {
+      "id": "fixture-id-001",
+      "label": "CI pipeline",
+      "created": "2026-10-04T13:10:00Z",
+      "expires": ""
+    }
+  ],
+  "audit": [
+    {
+      "time": "2026-10-05T08:30:00Z",
+      "user": "build-agent",
+      "method": "PUT",
+      "path": "/repository/maven-releases/com/example/platform/2.4.0/platform-2.4.0.jar",
+      "status": 201,
+      "requestId": "fixture-request-001"
+    },
+    {
+      "time": "2026-10-05T07:15:00Z",
+      "user": "admin",
+      "method": "POST",
+      "path": "/api/repos",
+      "status": 201,
+      "requestId": "fixture-request-002"
+    }
+  ],
+  "releases": [
+    {
+      "id": "7704931f-be4b-563c-8ed3-39e95bc33cb5",
+      "name": "checkout-api",
+      "version": "2026.10.2",
+      "state": "RELEASED",
+      "createdBy": "build-agent",
+      "created": "2026-10-05T07:15:00Z",
+      "updated": "2026-10-05T08:35:00Z",
+      "revision": 4,
+      "note": "Synthetic preview data. No customer information or production evidence.",
+      "assetCount": 2,
+      "logicalBytes": 6625920,
+      "manifest": [
+        {
+          "repo": "maven-releases",
+          "path": "com/example/platform/2.4.0/platform-2.4.0.jar",
+          "size": 6240896,
+          "updated": "2026-10-05T08:30:00Z",
+          "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+          "contentType": "application/octet-stream"
+        },
+        {
+          "repo": "npm-hosted",
+          "path": "@example/design-system/-/design-system-1.8.2.tgz",
+          "size": 385024,
+          "updated": "2026-10-05T07:15:00Z",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "contentType": "application/octet-stream"
+        }
+      ],
+      "events": [
+        {
+          "action": "create",
+          "actor": "build-agent",
+          "time": "2026-10-05T07:15:00Z",
+          "note": "Synthetic fixture: captured from a sample build."
+        },
+        {
+          "action": "submit",
+          "actor": "build-agent",
+          "time": "2026-10-05T07:30:00Z",
+          "note": "Sample review request."
+        },
+        {
+          "action": "approve",
+          "actor": "release-reviewer",
+          "time": "2026-10-05T08:00:00Z",
+          "note": "Synthetic independent approval. Not a real release."
+        },
+        {
+          "action": "release",
+          "actor": "build-agent",
+          "time": "2026-10-05T08:15:00Z",
+          "note": "Sample signed decision for interface demonstration."
+        }
+      ],
+      "manifestDigest": "d737056eff789f916ba6eed388879a67ea8ae501eb9ccdd185ddcc9cd7daafb3",
+      "allowedActions": [
+        "revoke"
+      ],
+      "evidence": {
+        "syntheticFixture": true
+      }
+    },
+    {
+      "id": "b6d4bb4b-e9e3-51f9-85a0-551a38739f60",
+      "name": "design-system",
+      "version": "3.8.0",
+      "state": "IN_REVIEW",
+      "createdBy": "frontend-ci",
+      "created": "2026-10-05T07:15:00Z",
+      "updated": "2026-10-05T08:34:00Z",
+      "revision": 2,
+      "note": "Synthetic preview data. No customer information or production evidence.",
+      "assetCount": 2,
+      "logicalBytes": 6625920,
+      "manifest": [
+        {
+          "repo": "maven-releases",
+          "path": "com/example/platform/2.4.0/platform-2.4.0.jar",
+          "size": 6240896,
+          "updated": "2026-10-05T08:30:00Z",
+          "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+          "contentType": "application/octet-stream"
+        },
+        {
+          "repo": "npm-hosted",
+          "path": "@example/design-system/-/design-system-1.8.2.tgz",
+          "size": 385024,
+          "updated": "2026-10-05T07:15:00Z",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "contentType": "application/octet-stream"
+        }
+      ],
+      "events": [
+        {
+          "action": "create",
+          "actor": "frontend-ci",
+          "time": "2026-10-05T07:15:00Z",
+          "note": "Synthetic fixture: captured from a sample build."
+        },
+        {
+          "action": "submit",
+          "actor": "frontend-ci",
+          "time": "2026-10-05T07:30:00Z",
+          "note": "Sample review request."
+        }
+      ],
+      "manifestDigest": "d555b87cf91a85f641dbc415375adc4fe2aff893070a6a6884f7a65539d94522",
+      "allowedActions": [
+        "approve",
+        "reject"
+      ]
+    },
+    {
+      "id": "d082c85e-3eac-5dff-823a-08908beb3cde",
+      "name": "billing-worker",
+      "version": "1.14.0",
+      "state": "APPROVED",
+      "createdBy": "build-agent",
+      "created": "2026-10-05T07:15:00Z",
+      "updated": "2026-10-05T08:33:00Z",
+      "revision": 3,
+      "note": "Synthetic preview data. No customer information or production evidence.",
+      "assetCount": 2,
+      "logicalBytes": 6625920,
+      "manifest": [
+        {
+          "repo": "maven-releases",
+          "path": "com/example/platform/2.4.0/platform-2.4.0.jar",
+          "size": 6240896,
+          "updated": "2026-10-05T08:30:00Z",
+          "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+          "contentType": "application/octet-stream"
+        },
+        {
+          "repo": "npm-hosted",
+          "path": "@example/design-system/-/design-system-1.8.2.tgz",
+          "size": 385024,
+          "updated": "2026-10-05T07:15:00Z",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "contentType": "application/octet-stream"
+        }
+      ],
+      "events": [
+        {
+          "action": "create",
+          "actor": "build-agent",
+          "time": "2026-10-05T07:15:00Z",
+          "note": "Synthetic fixture: captured from a sample build."
+        },
+        {
+          "action": "submit",
+          "actor": "build-agent",
+          "time": "2026-10-05T07:30:00Z",
+          "note": "Sample review request."
+        },
+        {
+          "action": "approve",
+          "actor": "release-reviewer",
+          "time": "2026-10-05T08:00:00Z",
+          "note": "Synthetic independent approval. Not a real release."
+        }
+      ],
+      "manifestDigest": "603b188783cc0a0cd116ef6ab94f5b6f71f9ba4aae31ab942446a93d1ba38899",
+      "allowedActions": [
+        "release"
+      ]
+    },
+    {
+      "id": "d82bbdf2-eb6d-52c1-9dc2-1e714a0a1b14",
+      "name": "edge-config",
+      "version": "2026.10",
+      "state": "DRAFT",
+      "createdBy": "admin",
+      "created": "2026-10-05T07:15:00Z",
+      "updated": "2026-10-05T08:32:00Z",
+      "revision": 1,
+      "note": "Synthetic preview data. No customer information or production evidence.",
+      "assetCount": 2,
+      "logicalBytes": 6625920,
+      "manifest": [
+        {
+          "repo": "maven-releases",
+          "path": "com/example/platform/2.4.0/platform-2.4.0.jar",
+          "size": 6240896,
+          "updated": "2026-10-05T08:30:00Z",
+          "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+          "contentType": "application/octet-stream"
+        },
+        {
+          "repo": "npm-hosted",
+          "path": "@example/design-system/-/design-system-1.8.2.tgz",
+          "size": 385024,
+          "updated": "2026-10-05T07:15:00Z",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "contentType": "application/octet-stream"
+        }
+      ],
+      "events": [
+        {
+          "action": "create",
+          "actor": "admin",
+          "time": "2026-10-05T07:15:00Z",
+          "note": "Synthetic fixture: captured from a sample build."
+        }
+      ],
+      "manifestDigest": "240bfa04ce9cab5987603c1ce080e270ce8e03645453d27d3d85af58df7da4d3",
+      "allowedActions": [
+        "submit"
+      ]
+    },
+    {
+      "id": "95288db2-5895-528a-aca2-dff62efe7e2b",
+      "name": "platform-sdk",
+      "version": "2.4.0",
+      "state": "RELEASED",
+      "createdBy": "build-agent",
+      "created": "2026-10-05T07:15:00Z",
+      "updated": "2026-10-05T08:31:00Z",
+      "revision": 4,
+      "note": "Synthetic preview data. No customer information or production evidence.",
+      "assetCount": 2,
+      "logicalBytes": 6625920,
+      "manifest": [
+        {
+          "repo": "maven-releases",
+          "path": "com/example/platform/2.4.0/platform-2.4.0.jar",
+          "size": 6240896,
+          "updated": "2026-10-05T08:30:00Z",
+          "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+          "contentType": "application/octet-stream"
+        },
+        {
+          "repo": "npm-hosted",
+          "path": "@example/design-system/-/design-system-1.8.2.tgz",
+          "size": 385024,
+          "updated": "2026-10-05T07:15:00Z",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "contentType": "application/octet-stream"
+        }
+      ],
+      "events": [
+        {
+          "action": "create",
+          "actor": "build-agent",
+          "time": "2026-10-05T07:15:00Z",
+          "note": "Synthetic fixture: captured from a sample build."
+        },
+        {
+          "action": "submit",
+          "actor": "build-agent",
+          "time": "2026-10-05T07:30:00Z",
+          "note": "Sample review request."
+        },
+        {
+          "action": "approve",
+          "actor": "release-reviewer",
+          "time": "2026-10-05T08:00:00Z",
+          "note": "Synthetic independent approval. Not a real release."
+        },
+        {
+          "action": "release",
+          "actor": "build-agent",
+          "time": "2026-10-05T08:15:00Z",
+          "note": "Sample signed decision for interface demonstration."
+        }
+      ],
+      "manifestDigest": "9b80710c49b10ba2c2002320abc29aa3c78730f73eb13444cb10930543eac0e3",
+      "allowedActions": [
+        "revoke"
+      ],
+      "evidence": {
+        "syntheticFixture": true
+      }
+    },
+    {
+      "id": "8885fc5e-101d-5b71-bbb6-c560b0a6620c",
+      "name": "mobile-assets",
+      "version": "4.2.1",
+      "state": "IN_REVIEW",
+      "createdBy": "mobile-ci",
+      "created": "2026-10-05T07:15:00Z",
+      "updated": "2026-10-05T08:30:00Z",
+      "revision": 2,
+      "note": "Synthetic preview data. No customer information or production evidence.",
+      "assetCount": 2,
+      "logicalBytes": 6625920,
+      "manifest": [
+        {
+          "repo": "maven-releases",
+          "path": "com/example/platform/2.4.0/platform-2.4.0.jar",
+          "size": 6240896,
+          "updated": "2026-10-05T08:30:00Z",
+          "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+          "contentType": "application/octet-stream"
+        },
+        {
+          "repo": "npm-hosted",
+          "path": "@example/design-system/-/design-system-1.8.2.tgz",
+          "size": 385024,
+          "updated": "2026-10-05T07:15:00Z",
+          "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "contentType": "application/octet-stream"
+        }
+      ],
+      "events": [
+        {
+          "action": "create",
+          "actor": "mobile-ci",
+          "time": "2026-10-05T07:15:00Z",
+          "note": "Synthetic fixture: captured from a sample build."
+        },
+        {
+          "action": "submit",
+          "actor": "mobile-ci",
+          "time": "2026-10-05T07:30:00Z",
+          "note": "Sample review request."
+        }
+      ],
+      "manifestDigest": "4764c3f8afc5ccdc0fc2cd2de598fb040630a91a1b5d91e0c2712a23505d292b",
+      "allowedActions": [
+        "approve",
+        "reject"
+      ]
+    }
+  ],
+  "insights": {
+    "measuredAt": "2026-10-05T08:30:00Z",
+    "logicalBytes": 330301440,
+    "liveUniqueBytes": 234881024,
+    "deduplicatedBytes": 95420416,
+    "pinnedOnlyBytes": 28311552,
+    "retainedUniqueBytes": 263192576,
+    "deduplicationPercent": 28.9,
+    "assets": 3026,
+    "quarantinedReferences": 2,
+    "releaseCount": 6,
+    "releaseStates": {
+      "DRAFT": 1,
+      "IN_REVIEW": 2,
+      "APPROVED": 1,
+      "RELEASED": 2
+    },
+    "diskTotalBytes": 214748364800,
+    "diskUsableBytes": 146028888064,
+    "repositories": [
+      {
+        "name": "maven-releases",
+        "format": "maven",
+        "type": "hosted",
+        "assets": 1248,
+        "logicalBytes": 53926080
+      },
+      {
+        "name": "maven-central",
+        "format": "maven",
+        "type": "proxy",
+        "assets": 896,
+        "logicalBytes": 38716160
+      },
+      {
+        "name": "npm-hosted",
+        "format": "npm",
+        "type": "hosted",
+        "assets": 372,
+        "logicalBytes": 16074120
+      },
+      {
+        "name": "npm-group",
+        "format": "npm",
+        "type": "group",
+        "assets": 0,
+        "logicalBytes": 0
+      },
+      {
+        "name": "nuget-hosted",
+        "format": "nuget",
+        "type": "hosted",
+        "assets": 218,
+        "logicalBytes": 9419780
+      },
+      {
+        "name": "pypi-hosted",
+        "format": "pypi",
+        "type": "hosted",
+        "assets": 164,
+        "logicalBytes": 7086440
+      },
+      {
+        "name": "docker-hosted",
+        "format": "docker",
+        "type": "hosted",
+        "assets": 86,
+        "logicalBytes": 3716060
+      },
+      {
+        "name": "raw-hosted",
+        "format": "raw",
+        "type": "hosted",
+        "assets": 42,
+        "logicalBytes": 1814820
+      }
+    ],
+    "recommendations": [
+      {
+        "code": "MUTABLE_REPOSITORY",
+        "repo": "raw-hosted"
+      },
+      {
+        "code": "HELD_CONTENT",
+        "count": 2
+      },
+      {
+        "code": "PINNED_HISTORY",
+        "bytes": 28311552
+      }
+    ],
+    "scope": "visible-repositories-and-host",
+    "includesUnreferencedBlobs": false
+  },
+  "quarantine": [
+    {
+      "sha256": "8dd6df18f39390a986871f41f0f834c9642375d9b6d043fe4ff450bdb7095609",
+      "active": true,
+      "reason": "Manual investigation requested by release engineering. Synthetic example.",
+      "revision": 1,
+      "updated": "2026-10-05T08:00:00Z",
+      "actor": "admin"
+    }
+  ]
+}

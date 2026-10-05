@@ -1,0 +1,9 @@
+test_missing_trust_argument_is_not_automatic_trust (__main__.EvidenceCliTest.test_missing_trust_argument_is_not_automatic_trust) ... ok
+test_payload_tampering_is_rejected (__main__.EvidenceCliTest.test_payload_tampering_is_rejected) ... ok
+test_replaced_trust_root_is_rejected (__main__.EvidenceCliTest.test_replaced_trust_root_is_rejected) ... ok
+test_valid_signature_with_independently_supplied_identity (__main__.EvidenceCliTest.test_valid_signature_with_independently_supplied_identity) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 3.121s
+
+OK
